@@ -1,0 +1,27 @@
+{
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"files.eol": "\n",
+	"[typescript]": {
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
+		"editor.formatOnSave": true
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
+		"editor.formatOnSave": true
+	},
+	"eslint.run": "onType",
+	"eslint.format.enable": true,
+	"material-icon-theme.files.associations": {
+		"*.story.luau": "Storybook"
+	},
+	"material-icon-theme.folders.associations": {
+		"story": "Storybook",
+		"component": "Components",
+		"reflex": "Cart",
+		"ui": "Interface",
+		"tags": "Log",
+		"complex": "resource",
+		"siteComponents": "Public",
+		"signal": "upload"
+	},
+}
