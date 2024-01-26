@@ -1,10 +1,17 @@
 import ReactRoblox from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
 import { setTimeout } from "@rbxts/set-timeout";
+import { CreateProducer as CreateClientProducer, defaultState as defaultClientState } from "shared/reflex/clientState";
+import {
+	CreateProducer as CreateProfileProducer,
+	defaultState as defaultProfileState,
+} from "shared/reflex/serverProfile";
+import { CreateProducer as CreateServerProducer, defaultState as defaultServerState } from "shared/reflex/serverState";
+import { RouterProps } from "shared/types/UITypes";
 import GameRouter from "shared/ui/gameRouter";
 import LocalPlayer from "shared/util/LocalPlayer";
 
-const renderRouter = (root: ReactRoblox.Root, props: CommonProps) => {
+const renderRouter = (root: ReactRoblox.Root, props: RouterProps) => {
 	root.render(Roact.createElement(GameRouter, props));
 };
 
@@ -15,16 +22,15 @@ const clientInterface: InitializerFunction = () => {
 	container.Parent = LocalPlayer.PlayerGui;
 
 	const root = ReactRoblox.createRoot(container);
-	const props = {
-		clientState: {
-			loading: true,
-		},
+	const props: RouterProps = {
+		clientState: CreateClientProducer(defaultClientState),
+		serverProfile: CreateProfileProducer(defaultProfileState),
+		serverState: CreateServerProducer(defaultServerState),
 	};
 
 	renderRouter(root, props);
 
 	const cleanup = setTimeout(() => {
-		props.clientState.loading = false;
 		renderRouter(root, props);
 	}, 5);
 

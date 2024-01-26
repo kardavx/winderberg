@@ -1,11 +1,12 @@
-import Remo, { Server, loggerMiddleware, remote, throttleMiddleware } from "@rbxts/remo";
+import Remo, { Client, Server, loggerMiddleware, remote, throttleMiddleware } from "@rbxts/remo";
 import { t } from "@rbxts/t";
+import { State as profileState } from "shared/reflex/serverProfile";
+import { State as serverState } from "shared/reflex/serverState";
 
 export default Remo.createRemotes({
-	TestReplicate: remote<Server, [message: string]>(t.string).middleware(
-		loggerMiddleware,
-		throttleMiddleware({
-			throttle: 1,
-		}),
-	),
+	GetPlayerData: remote<Server, []>().returns<profileState | undefined>(),
+	GetServerData: remote<Server, []>().returns<serverState | undefined>(),
+	ReplicateProfile: remote<Server, [{ name: string; arguments: [...args: unknown[]] }]>(),
+	ReplicateState: remote<Server, [{ name: string; arguments: [...args: unknown[]] }]>(),
+	GetReplicatedProfile: remote<Client, [{ name: string; arguments: [...args: unknown[]] }]>(),
 });

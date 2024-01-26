@@ -2,7 +2,7 @@ import Maid from "@rbxts/maid";
 import { ContextActionService, UserInputService, Workspace } from "@rbxts/services";
 import cameraModifier from "shared/class/cameraModifier";
 import cameraConfig from "shared/config/cameraConfig";
-import gameSignals from "shared/signal/gameSignals";
+import gameSignals from "shared/signal/clientSignals";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import lerpNumber from "shared/util/lerpNumber";

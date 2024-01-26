@@ -9,10 +9,10 @@ export default (props: Props) => {
 
 	return (
 		<frame
-			{...props}
 			Size={new UDim2(1, 0, 1, inset.Y)}
 			AnchorPoint={new Vector2(0.5, 1)}
 			Position={UDim2.fromScale(0.5, 1)}
+			{...props}
 		>
 			<Padding Size={6} />
 

@@ -3,11 +3,15 @@ import useSpring from "shared/ui/hook/useSpring";
 import FullscreenFrame from "../base/FullscreenFrame";
 import Text from "../base/Text";
 
-export default (props: CommonProps) => {
+interface Props {
+	loading: boolean;
+}
+
+export default (props: Props) => {
 	const [transparencyFactor, setTransparencyFactor] = useSpring({
-		initialValue: props.clientState.loading === true ? 0 : 1,
+		initialValue: props.loading === true ? 0 : 1,
 	});
-	setTransparencyFactor(props.clientState.loading === true ? 0 : 1);
+	setTransparencyFactor(props.loading === true ? 0 : 1);
 
 	return (
 		<FullscreenFrame

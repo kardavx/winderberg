@@ -12,13 +12,14 @@
 	"eslint.run": "onType",
 	"eslint.format.enable": true,
 	"material-icon-theme.files.associations": {
-		"*.story.luau": "Storybook"
+		"*.story.tsx": "Storybook"
 	},
 	"material-icon-theme.folders.associations": {
 		"story": "Storybook",
 		"component": "Components",
 		"reflex": "Cart",
 		"ui": "Interface",
+		"network": "Client",
 		"tags": "Log",
 		"complex": "resource",
 		"siteComponents": "Public",

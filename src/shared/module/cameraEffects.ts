@@ -1,6 +1,6 @@
 import Maid from "@rbxts/maid";
 import cameraModifier from "shared/class/cameraModifier";
-import gameSignals from "shared/signal/gameSignals";
+import gameSignals from "shared/signal/clientSignals";
 
 const effectStrength = 0.025;
 

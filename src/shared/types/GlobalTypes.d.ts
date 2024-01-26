@@ -1,9 +1,3 @@
-interface CommonProps {
-	clientState: {
-		loading: boolean;
-	};
-}
-
 type InitializerFunction = () => () => void;
 type CharacterInitializerFunction = (character: Character) => () => void;
 

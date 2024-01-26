@@ -1,10 +1,9 @@
 import Maid from "@rbxts/maid";
 import { RunService } from "@rbxts/services";
 import clientInterface from "shared/module/clientInterface";
-import gameSignals from "shared/signal/gameSignals";
+import gameSignals from "shared/signal/clientSignals";
 import LocalPlayer from "shared/util/LocalPlayer";
 import camera from "shared/module/camera/camera";
-import replicationTest from "shared/module/replicationTest";
 import movement from "shared/module/movement";
 import cameraEffects from "shared/module/cameraEffects";
 
@@ -45,4 +44,3 @@ maid.GiveTask(
 );
 
 maid.GiveTask(clientInterface());
-maid.GiveTask(replicationTest());

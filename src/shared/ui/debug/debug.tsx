@@ -2,6 +2,7 @@ import Roact from "@rbxts/roact";
 import DebugButton from "./debugButton";
 import Padding from "../components/base/Padding";
 import OnKeyClicked from "shared/util/OnKeyClicked";
+import { CommonProps } from "shared/types/UITypes";
 
 export default (props: CommonProps) => {
 	const [isShown, setIsShown] = Roact.useState(true);

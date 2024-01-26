@@ -1,5 +1,6 @@
-import network from "shared/network/network";
+import Maid from "@rbxts/maid";
+import serverData from "./module/serverData";
 
-network.TestReplicate.connect((player: Player, message) => {
-	print(message);
-});
+const maid = new Maid();
+
+maid.GiveTask(serverData());
