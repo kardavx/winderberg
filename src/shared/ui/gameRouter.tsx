@@ -18,7 +18,7 @@ export default (props: {
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
 			<frame Visible={isLoaded} Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
 				<Debug {...(props as CommonProps)} />
-				<Menu {...(props as CommonProps)} />
+				{/* <Menu {...(props as CommonProps)} /> */}
 			</frame>
 
 			<Loading loading={!isLoaded}></Loading>

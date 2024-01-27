@@ -3,9 +3,14 @@ import DebugButton from "./debugButton";
 import Padding from "../components/base/Padding";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import { CommonProps } from "shared/types/UITypes";
+import useProducerAsState from "../util/useProducerAsState";
 
 export default (props: CommonProps) => {
-	const [isShown, setIsShown] = Roact.useState(true);
+	const [isShown, setIsShown] = Roact.useState(false);
+
+	const [count] = useProducerAsState(props.clientState, (state) => {
+		return state.count;
+	});
 
 	Roact.useEffect(() => {
 		const cleanup = OnKeyClicked("handleDebugMenu", () => setIsShown(!isShown), Enum.KeyCode.F2);
@@ -28,9 +33,9 @@ export default (props: CommonProps) => {
 			<Padding Size={10} />
 
 			<DebugButton
-				Text="testowy przycisk"
+				Text={tostring(count)}
 				Callback={() => {
-					print("testowy przycisk clicked!");
+					(props.clientState.increment as () => void)();
 				}}
 			/>
 			<DebugButton

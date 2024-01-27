@@ -1,7 +1,5 @@
 import { Producer, createProducer } from "@rbxts/reflex";
 
-export type ClientProducer = Producer<State, Actions>;
-
 export interface State {
 	count: number;
 }
@@ -9,6 +7,8 @@ export interface State {
 export interface Actions {
 	increment: () => void;
 }
+
+export type ClientProducer = Producer<State, Actions>;
 
 export const defaultState: State = {
 	count: 0,

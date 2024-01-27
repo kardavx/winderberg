@@ -6,6 +6,7 @@ import LocalPlayer from "shared/util/LocalPlayer";
 import camera from "shared/module/camera/camera";
 import movement from "shared/module/movement";
 import cameraEffects from "shared/module/cameraEffects";
+import clientPlayerData from "shared/module/clientPlayerData";
 
 const maid = new Maid();
 const characterMaid = new Maid();
@@ -43,4 +44,5 @@ maid.GiveTask(
 	}),
 );
 
+maid.GiveTask(clientPlayerData());
 maid.GiveTask(clientInterface());

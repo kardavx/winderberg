@@ -1,6 +1,10 @@
 type InitializerFunction = () => () => void;
 type CharacterInitializerFunction = (character: Character) => () => void;
 
+type withCallSignature = {
+	[key in string]: (...args: unknown[]) => void;
+};
+
 interface HumanoidWithAnimator extends Humanoid {
 	Animator: Animator;
 }

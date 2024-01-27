@@ -1,15 +1,10 @@
 import ReactRoblox from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
-import { setTimeout } from "@rbxts/set-timeout";
-import { CreateProducer as CreateClientProducer, defaultState as defaultClientState } from "shared/reflex/clientState";
-import {
-	CreateProducer as CreateProfileProducer,
-	defaultState as defaultProfileState,
-} from "shared/reflex/serverProfile";
-import { CreateProducer as CreateServerProducer, defaultState as defaultServerState } from "shared/reflex/serverState";
 import { RouterProps } from "shared/types/UITypes";
 import GameRouter from "shared/ui/gameRouter";
 import LocalPlayer from "shared/util/LocalPlayer";
+import { clientProducer, isPlayerDataLoaded, isServerDataLoaded, serverProfile, serverState } from "./clientPlayerData";
+import clientSignals from "shared/signal/clientSignals";
 
 const renderRouter = (root: ReactRoblox.Root, props: RouterProps) => {
 	root.render(Roact.createElement(GameRouter, props));
@@ -22,22 +17,36 @@ const clientInterface: InitializerFunction = () => {
 	container.Parent = LocalPlayer.PlayerGui;
 
 	const root = ReactRoblox.createRoot(container);
-	const props: RouterProps = {
-		clientState: CreateClientProducer(defaultClientState),
-		serverProfile: CreateProfileProducer(defaultProfileState),
-		serverState: CreateServerProducer(defaultServerState),
-	};
 
-	renderRouter(root, props);
+	renderRouter(root, {
+		clientState: clientProducer,
+		serverProfile: serverProfile,
+		serverState: serverState,
+	});
 
-	const cleanup = setTimeout(() => {
-		renderRouter(root, props);
-	}, 5);
+	if (!isPlayerDataLoaded) {
+		clientSignals.playerDataLoaded.Once(() => {
+			renderRouter(root, {
+				clientState: clientProducer,
+				serverProfile: serverProfile,
+				serverState: serverState,
+			});
+		});
+	}
+
+	if (!isServerDataLoaded) {
+		clientSignals.serverDataLoaded.Once(() => {
+			renderRouter(root, {
+				clientState: clientProducer,
+				serverProfile: serverProfile,
+				serverState: serverState,
+			});
+		});
+	}
 
 	return () => {
 		root.unmount();
 		container.Destroy();
-		cleanup();
 	};
 };
 

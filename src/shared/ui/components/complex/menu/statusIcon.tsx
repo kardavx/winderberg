@@ -25,7 +25,7 @@ export default (props: Props) => {
 
 	return (
 		<frame
-			Size={UDim2.fromScale(0.2, 0.2)}
+			Size={UDim2.fromScale(0.5, 0.5)}
 			BackgroundColor3={props.isActive ? Mocha.Green : Mocha.Red}
 			BorderSizePixel={0}
 			Event={{

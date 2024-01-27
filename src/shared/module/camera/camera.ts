@@ -64,9 +64,9 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 				CurrentCamera.CameraType = Enum.CameraType.Scriptable;
 			}
 
-			if (UserInputService.MouseBehavior !== Enum.MouseBehavior.LockCenter) {
-				UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter;
-			}
+			// if (UserInputService.MouseBehavior !== Enum.MouseBehavior.LockCenter) {
+			// 	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter;
+			// }
 
 			const cameraSubject = character.HumanoidRootPart.Position;
 			const baseCFrame = new CFrame(cameraSubject).mul(

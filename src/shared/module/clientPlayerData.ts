@@ -1,5 +1,4 @@
 import Maid from "@rbxts/maid";
-import { Producer } from "@rbxts/reflex";
 import network from "shared/network/network";
 import gameSignals from "shared/signal/clientSignals";
 
@@ -16,6 +15,7 @@ import {
 	ServerProducer,
 	State as serverProdState,
 } from "shared/reflex/serverState";
+import { Signal } from "@rbxts/beacon";
 
 export let clientProducer: ClientProducer = CreateClientProducer(defaultState);
 export let serverProfile: ProfileProducer | undefined;
@@ -131,6 +131,8 @@ const clientPlayerData: InitializerFunction = () => {
 	const maid = new Maid();
 
 	clientProducer = CreateClientProducer(defaultState);
+	serverProfile = undefined;
+	serverState = undefined;
 
 	nextProfileActionIsReplicated = false;
 	nextStateActionIsReplicated = false;
@@ -158,7 +160,22 @@ const clientPlayerData: InitializerFunction = () => {
 				gameSignals.playerDataLoaded.Wait();
 			}
 
-			// serverProfile?[data.name](...data.arguments);
+			const actualProfile = serverProfile as unknown as withCallSignature;
+			actualProfile[data.name](...data.arguments);
+		}),
+	);
+
+	maid.GiveTask(
+		network.GetReplicatedState.connect((data) => {
+			nextStateActionIsReplicated = true;
+
+			if (!isServerDataLoaded) {
+				warn("Queued store action before server data loaded");
+				gameSignals.serverDataLoaded.Wait();
+			}
+
+			const actualProfile = serverState as unknown as withCallSignature;
+			actualProfile[data.name](...data.arguments);
 		}),
 	);
 
