@@ -17,7 +17,6 @@ const clientInterface: InitializerFunction = () => {
 	container.Parent = LocalPlayer.PlayerGui;
 
 	const root = ReactRoblox.createRoot(container);
-	root.render(Roact.createElement(teamDiedUI));
 
 	renderRouter(root, {
 		clientState: clientProducer,
