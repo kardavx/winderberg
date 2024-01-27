@@ -83,6 +83,8 @@ const getDataToSave = (state: profileState, saveExceptions: typeof profileSaveEx
 };
 
 const serverData: InitializerFunction = () => {
+	print("running serverData");
+
 	const maid = new Maid();
 	serverState = undefined;
 	playerProfiles = {};
@@ -129,6 +131,8 @@ const serverData: InitializerFunction = () => {
 
 	maid.GiveTask(
 		serverSignals.playerAdded.Connect((player: Player) => {
+			print("loading player");
+
 			profilesCollection
 				.load(`playerProfile_${player.UserId}_${dataConfig.playerProfileKey}`, [player.UserId])
 				.andThen((document) => {
@@ -195,16 +199,18 @@ const serverData: InitializerFunction = () => {
 
 	network.GetPlayerData.onRequest((player: Player) => {
 		const profile = getPlayerProfile(player);
-		if (!profile) {
+		if (profile === undefined) {
 			return;
 		}
 
+		print("returning playerProfile producer's state");
 		return profile.producer.getState();
 	});
 
 	network.GetServerData.onRequest((player: Player) => {
-		if (!serverState) return;
+		if (serverState === undefined) return;
 
+		print("returning serverState producer's state");
 		return serverState.producer.getState();
 	});
 

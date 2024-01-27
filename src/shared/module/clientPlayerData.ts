@@ -15,7 +15,6 @@ import {
 	ServerProducer,
 	State as serverProdState,
 } from "shared/reflex/serverState";
-import { Signal } from "@rbxts/beacon";
 
 export let clientProducer: ClientProducer = CreateClientProducer(defaultState);
 export let serverProfile: ProfileProducer | undefined;
@@ -68,6 +67,8 @@ const loadProfileData = Promise.retryWithDelay(
 
 			playerData
 				.andThen((data) => {
+					print(data);
+
 					if (data === undefined) {
 						reject("No data");
 						return;
@@ -76,6 +77,7 @@ const loadProfileData = Promise.retryWithDelay(
 					resolve(data);
 				})
 				.catch((err: string) => {
+					print(err);
 					reject(err);
 				});
 		});
@@ -130,6 +132,8 @@ const loadServerState = (): Promise<ServerProducer> => {
 const clientPlayerData: InitializerFunction = () => {
 	const maid = new Maid();
 
+	print("loading player data");
+
 	clientProducer = CreateClientProducer(defaultState);
 	serverProfile = undefined;
 	serverState = undefined;
@@ -139,13 +143,17 @@ const clientPlayerData: InitializerFunction = () => {
 	isServerDataLoaded = false;
 	isPlayerDataLoaded = false;
 
+	print("loading profile");
 	loadProfile().andThen((serverProfileProducer) => {
+		print("profile loaded");
 		serverProfile = serverProfileProducer;
 		isPlayerDataLoaded = true;
 		gameSignals.playerDataLoaded.Fire();
 	});
 
+	print("loading state");
 	loadServerState().andThen((serverStateProducer) => {
+		print("profile loaded");
 		serverState = serverStateProducer;
 		isServerDataLoaded = true;
 		gameSignals.serverDataLoaded.Fire();
@@ -153,6 +161,7 @@ const clientPlayerData: InitializerFunction = () => {
 
 	maid.GiveTask(
 		network.GetReplicatedProfile.connect((data) => {
+			print("on profile repliation");
 			nextProfileActionIsReplicated = true;
 
 			if (!isPlayerDataLoaded) {
@@ -167,6 +176,7 @@ const clientPlayerData: InitializerFunction = () => {
 
 	maid.GiveTask(
 		network.GetReplicatedState.connect((data) => {
+			print("on state repliation");
 			nextStateActionIsReplicated = true;
 
 			if (!isServerDataLoaded) {
