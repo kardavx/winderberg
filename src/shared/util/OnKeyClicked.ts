@@ -1,6 +1,10 @@
 import { ContextActionService } from "@rbxts/services";
 
-export default (bindingName: string, callback: () => void, ...keycodes: Enum.KeyCode[]): (() => void) => {
+export default (
+	bindingName: string,
+	callback: () => void,
+	...keycodes: (Enum.KeyCode | Enum.UserInputType)[]
+): (() => void) => {
 	ContextActionService.BindAction(
 		bindingName,
 		(_, inputState: Enum.UserInputState) => {

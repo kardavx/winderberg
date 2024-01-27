@@ -26,6 +26,14 @@ export let isServerDataLoaded: boolean = false;
 let nextProfileActionIsReplicated = false;
 let nextStateActionIsReplicated = false;
 
+export const getServerProfile = () => {
+	return serverProfile;
+};
+
+export const getServerState = () => {
+	return serverState;
+};
+
 const replicateProfileMiddleware = () => {
 	return (dispatch: (...args: unknown[]) => unknown, name: string) =>
 		(...args: unknown[]) => {
@@ -67,8 +75,6 @@ const loadProfileData = Promise.retryWithDelay(
 
 			playerData
 				.andThen((data) => {
-					print(data);
-
 					if (data === undefined) {
 						reject("No data");
 						return;
@@ -77,7 +83,6 @@ const loadProfileData = Promise.retryWithDelay(
 					resolve(data);
 				})
 				.catch((err: string) => {
-					print(err);
 					reject(err);
 				});
 		});
@@ -111,28 +116,28 @@ const loadServerData = Promise.retryWithDelay(
 
 const loadProfile = (): Promise<ProfileProducer> => {
 	return new Promise((resolve) => {
-		const [_, serverPlayerData] = loadProfileData.await() as [boolean, profileState];
-		const serverProfileProducer = CreateProfileProducer(serverPlayerData);
-		serverProfileProducer.applyMiddleware(replicateProfileMiddleware);
+		loadProfileData.andThen((serverPlayerData) => {
+			const serverProfileProducer = CreateProfileProducer(serverPlayerData as profileState);
+			serverProfileProducer.applyMiddleware(replicateProfileMiddleware);
 
-		resolve(serverProfileProducer);
+			resolve(serverProfileProducer);
+		});
 	});
 };
 
 const loadServerState = (): Promise<ServerProducer> => {
 	return new Promise((resolve) => {
-		const [_, serverData] = loadServerData.await() as [boolean, serverProdState];
-		const serverProducer = CreateServerProducer(serverData);
-		serverProducer.applyMiddleware(replicateStateMiddleware);
+		loadServerData.andThen((serverData) => {
+			const serverProducer = CreateServerProducer(serverData as serverProdState);
+			serverProducer.applyMiddleware(replicateStateMiddleware);
 
-		resolve(serverProducer);
+			resolve(serverProducer);
+		});
 	});
 };
 
 const clientPlayerData: InitializerFunction = () => {
 	const maid = new Maid();
-
-	print("loading player data");
 
 	clientProducer = CreateClientProducer(defaultState);
 	serverProfile = undefined;
@@ -143,17 +148,13 @@ const clientPlayerData: InitializerFunction = () => {
 	isServerDataLoaded = false;
 	isPlayerDataLoaded = false;
 
-	print("loading profile");
 	loadProfile().andThen((serverProfileProducer) => {
-		print("profile loaded");
 		serverProfile = serverProfileProducer;
 		isPlayerDataLoaded = true;
 		gameSignals.playerDataLoaded.Fire();
 	});
 
-	print("loading state");
 	loadServerState().andThen((serverStateProducer) => {
-		print("profile loaded");
 		serverState = serverStateProducer;
 		isServerDataLoaded = true;
 		gameSignals.serverDataLoaded.Fire();

@@ -4,11 +4,20 @@ import Padding from "../components/base/Padding";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import { CommonProps } from "shared/types/UITypes";
 import useProducerAsState from "../util/useProducerAsState";
+import { serverProfile } from "shared/module/clientPlayerData";
 
 export default (props: CommonProps) => {
 	const [isShown, setIsShown] = Roact.useState(false);
 
-	const [count] = useProducerAsState(props.clientState, (state) => {
+	const [clientCount] = useProducerAsState(props.clientState, (state) => {
+		return state.count;
+	});
+
+	const [profileCount] = useProducerAsState(props.serverProfile, (state) => {
+		return state.count;
+	});
+
+	const [serverCount] = useProducerAsState(props.serverState, (state) => {
 		return state.count;
 	});
 
@@ -33,21 +42,21 @@ export default (props: CommonProps) => {
 			<Padding Size={10} />
 
 			<DebugButton
-				Text={tostring(count)}
+				Text={tostring(clientCount)}
 				Callback={() => {
 					(props.clientState.increment as () => void)();
 				}}
 			/>
 			<DebugButton
-				Text="testowy przycisk"
+				Text={tostring(profileCount)}
 				Callback={() => {
-					print("testowy przycisk clicked!");
+					(props.serverProfile.increment as () => void)();
 				}}
 			/>
 			<DebugButton
-				Text="testowy przycisk"
+				Text={tostring(serverCount)}
 				Callback={() => {
-					print("testowy przycisk clicked!");
+					(props.serverState.increment as () => void)();
 				}}
 			/>
 		</frame>

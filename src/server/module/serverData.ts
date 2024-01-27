@@ -1,5 +1,5 @@
 import { Connection, Signal } from "@rbxts/beacon";
-import { createCollection } from "@rbxts/lapis";
+import { Document, createCollection } from "@rbxts/lapis";
 import Maid from "@rbxts/maid";
 import { Players } from "@rbxts/services";
 import { t } from "@rbxts/t";
@@ -17,6 +17,7 @@ import {
 	runtimeStateValidation as serverRuntimeStateValidation,
 	CreateProducer as createServerProducer,
 	saveExceptions as serverSaveExceptions,
+	State as serverProdState,
 } from "shared/reflex/serverState";
 import serverSignals from "shared/signal/serverSignals";
 import { ServerPlayerProfile, ServerState } from "shared/types/StateTypes";
@@ -72,14 +73,14 @@ export const waitForServerState = (): Promise<ServerState> => {
 	});
 };
 
-const getDataToSave = (state: profileState, saveExceptions: typeof profileSaveExceptions): Partial<profileState> => {
-	const newState: { [key: string]: unknown } = { ...state };
+const getDataToSave = <scopedState>(state: scopedState, saveExceptions: typeof profileSaveExceptions): scopedState => {
+	const newState = { ...state } as { [key: string]: unknown };
 
 	saveExceptions.forEach((exception: string) => {
 		newState[exception] = undefined;
 	});
 
-	return newState;
+	return newState as unknown as scopedState;
 };
 
 const serverData: InitializerFunction = () => {
@@ -92,9 +93,11 @@ const serverData: InitializerFunction = () => {
 	stateCollection
 		.load(dataConfig.serverStateKey)
 		.andThen((document) => {
+			const correctDocumentType = document as Document<serverProdState>;
+
 			const state = {
-				producer: createServerProducer(document),
-				document: document,
+				producer: createServerProducer(correctDocumentType.read()),
+				document: correctDocumentType,
 				nextActionIsReplicated: false,
 			};
 
@@ -120,13 +123,11 @@ const serverData: InitializerFunction = () => {
 			serverDataLoadedEvent.Fire(serverState);
 		})
 		.catch((err: string) => {
-			warn(`FATAL DATA ERROR! Server state has failed to load, kicking players!`);
+			warn(`FATAL DATA ERROR! Server state has failed to load, kicking players!\n`, err);
 
 			Players.GetPlayers().forEach((player: Player) => {
 				player.Kick(`FATAL DATA ERROR! Server state has failed to load, report this to the developers`);
 			});
-
-			error(err);
 		});
 
 	maid.GiveTask(
@@ -136,13 +137,15 @@ const serverData: InitializerFunction = () => {
 			profilesCollection
 				.load(`playerProfile_${player.UserId}_${dataConfig.playerProfileKey}`, [player.UserId])
 				.andThen((document) => {
+					const correctDocumentType = document as Document<profileState>;
+
 					if (!player.Parent) {
 						document.close().catch(warn);
 					} else {
 						const profile: ServerPlayerProfile = {
 							player: player,
-							document: document,
-							producer: createProfileProducer(document),
+							document: correctDocumentType,
+							producer: createProfileProducer(correctDocumentType.read()),
 							nextActionIsReplicated: false,
 						};
 
@@ -203,14 +206,14 @@ const serverData: InitializerFunction = () => {
 			return;
 		}
 
-		print("returning playerProfile producer's state");
+		print(profile.producer.getState());
 		return profile.producer.getState();
 	});
 
 	network.GetServerData.onRequest((player: Player) => {
 		if (serverState === undefined) return;
 
-		print("returning serverState producer's state");
+		print(serverState.producer.getState());
 		return serverState.producer.getState();
 	});
 

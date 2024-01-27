@@ -3,7 +3,13 @@ import Roact from "@rbxts/roact";
 import { RouterProps } from "shared/types/UITypes";
 import GameRouter from "shared/ui/gameRouter";
 import LocalPlayer from "shared/util/LocalPlayer";
-import { clientProducer, isPlayerDataLoaded, isServerDataLoaded, serverProfile, serverState } from "./clientPlayerData";
+import {
+	clientProducer,
+	getServerProfile,
+	getServerState,
+	isPlayerDataLoaded,
+	isServerDataLoaded,
+} from "./clientPlayerData";
 import clientSignals from "shared/signal/clientSignals";
 
 const renderRouter = (root: ReactRoblox.Root, props: RouterProps) => {
@@ -20,16 +26,16 @@ const clientInterface: InitializerFunction = () => {
 
 	renderRouter(root, {
 		clientState: clientProducer,
-		serverProfile: serverProfile,
-		serverState: serverState,
+		serverProfile: getServerProfile(),
+		serverState: getServerState(),
 	});
 
 	if (!isPlayerDataLoaded) {
 		clientSignals.playerDataLoaded.Once(() => {
 			renderRouter(root, {
 				clientState: clientProducer,
-				serverProfile: serverProfile,
-				serverState: serverState,
+				serverProfile: getServerProfile(),
+				serverState: getServerState(),
 			});
 		});
 	}
@@ -38,8 +44,8 @@ const clientInterface: InitializerFunction = () => {
 		clientSignals.serverDataLoaded.Once(() => {
 			renderRouter(root, {
 				clientState: clientProducer,
-				serverProfile: serverProfile,
-				serverState: serverState,
+				serverProfile: getServerProfile(),
+				serverState: getServerState(),
 			});
 		});
 	}
