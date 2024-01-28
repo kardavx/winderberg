@@ -121,6 +121,11 @@ const serverData: InitializerFunction = () => {
 			state.producer.applyMiddleware(replicateMiddleware);
 			serverState = state;
 			serverDataLoadedEvent.Fire(serverState);
+
+			state.document.beforeClose(() => {
+				state.document.write(getDataToSave(state.producer.getState(), serverSaveExceptions));
+				serverState = undefined;
+			});
 		})
 		.catch((err: string) => {
 			warn(`FATAL DATA ERROR! Server state has failed to load, kicking players!\n`, err);
@@ -186,16 +191,6 @@ const serverData: InitializerFunction = () => {
 				profile.document.write(getDataToSave(profile.producer.getState(), profileSaveExceptions));
 				profile.document.close().catch(warn);
 				playerProfiles[player.Name] = undefined;
-			}
-		}),
-	);
-
-	maid.GiveTask(
-		serverSignals.onClosing.Connect(() => {
-			if (serverState) {
-				serverState.document.write(getDataToSave(serverState.producer.getState(), serverSaveExceptions));
-				serverState.document.close().catch(warn);
-				serverState = undefined;
 			}
 		}),
 	);

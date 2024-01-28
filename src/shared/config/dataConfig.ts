@@ -1,4 +1,4 @@
 export default {
-	serverStateKey: `wynderberg_data`,
-	playerProfileKey: `dev_data_1`,
+	serverStateKey: `wynderberg_data_2`,
+	playerProfileKey: `dev_data_2`,
 };

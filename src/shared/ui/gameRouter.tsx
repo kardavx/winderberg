@@ -7,6 +7,7 @@ import { ServerProducer } from "shared/reflex/serverState";
 import { CommonProps } from "shared/types/UITypes";
 import Menu from "./components/complex/menu/menu";
 import Interaction from "./components/complex/interaction/interaction";
+import reactConditional from "./util/reactConditional";
 
 export default (props: {
 	clientState: ClientProducer;
@@ -15,15 +16,16 @@ export default (props: {
 }) => {
 	const isLoaded = props.serverProfile !== undefined && props.serverState !== undefined;
 
-	const routed = <Debug {...(props as CommonProps)} />;
-
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
-			<frame Visible={isLoaded} Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
-				<Debug {...(props as CommonProps)} />
-				<Interaction {...(props as CommonProps)} />
-				{/* <Menu {...(props as CommonProps)} /> */}
-			</frame>
+			{reactConditional(
+				isLoaded,
+				<Fragment>
+					<Debug {...(props as CommonProps)} />
+					<Interaction {...(props as CommonProps)} />
+					{/* <Menu {...(props as CommonProps)} /> */}
+				</Fragment>,
+			)}
 
 			<Loading loading={!isLoaded}></Loading>
 		</frame>

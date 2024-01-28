@@ -4,7 +4,6 @@ import Padding from "../components/base/Padding";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import { CommonProps } from "shared/types/UITypes";
 import useProducerAsState from "../util/useProducerAsState";
-import { serverProfile } from "shared/module/clientPlayerData";
 
 export default (props: CommonProps) => {
 	const [isShown, setIsShown] = Roact.useState(false);
