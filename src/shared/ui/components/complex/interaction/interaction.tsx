@@ -3,10 +3,8 @@ import Roact, { Fragment } from "@rbxts/roact";
 import { CollectionService, Workspace } from "@rbxts/services";
 import { CommonProps } from "shared/types/UITypes";
 import OnKeyHeld from "shared/util/OnKeyHeld";
-import interactionHighlight from "./interactionHighlight";
 import useSpring from "shared/ui/hook/useSpring";
 import clientSignals from "shared/signal/clientSignals";
-import { lerp } from "@rbxts/pretty-react-hooks";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import { Mocha } from "@rbxts/catppuccin";
@@ -15,8 +13,11 @@ import Center from "../../base/Center";
 import Padding from "../../base/Padding";
 import Text from "../../base/Text";
 import LocalPlayer from "shared/util/LocalPlayer";
+import interactionModelMock from "./interactionModelMock";
 
-const getFocusedInteraction = (): BasePart | undefined => {
+export type AllowedInteractionInstances = BasePart | Model;
+
+const getFocusedInteraction = (): AllowedInteractionInstances | undefined => {
 	const FilterDescendantsInstances: Instance[] = [CurrentCamera];
 	if (LocalPlayer.Character) FilterDescendantsInstances.push(LocalPlayer.Character);
 
@@ -33,16 +34,25 @@ const getFocusedInteraction = (): BasePart | undefined => {
 
 	if (!raycastResult) return;
 
-	if (raycastResult.Instance.HasTag("interaction")) return raycastResult.Instance as BasePart;
+	if (raycastResult.Instance.HasTag("interaction")) return raycastResult.Instance as AllowedInteractionInstances;
+	if (raycastResult.Instance.HasTag("interactionMock")) {
+		return raycastResult.Instance.Parent as Model;
+	}
 };
 
 export default (props: CommonProps) => {
 	const [interactionMode, setInteractionMode] = Roact.useState(false);
 	const [lastInteractingWith, setLastInteractingWith] = Roact.useBinding(undefined) as LuaTuple<
-		[Roact.Binding<BasePart | undefined>, (newValue: BasePart | undefined) => void]
+		[
+			Roact.Binding<AllowedInteractionInstances | undefined>,
+			(newValue: AllowedInteractionInstances | undefined) => void,
+		]
 	>;
 	const [interactingWith, setInteractingWith] = Roact.useState(undefined) as LuaTuple<
-		[BasePart | undefined, Roact.Dispatch<Roact.SetStateAction<BasePart | undefined>>]
+		[
+			AllowedInteractionInstances | undefined,
+			Roact.Dispatch<Roact.SetStateAction<AllowedInteractionInstances | undefined>>,
+		]
 	>;
 	const [lastRenderedSubInteractions, setLastRenderedSubInteractions] = Roact.useState([]) as unknown as LuaTuple<
 		[Roact.Element[], Roact.Dispatch<Roact.SetStateAction<Roact.Element[]>>]
@@ -73,6 +83,7 @@ export default (props: CommonProps) => {
 					Size={UDim2.fromScale(1, 1)}
 					Text=""
 					AnchorPoint={new Vector2(0, 0.5)}
+					AutomaticSize={Enum.AutomaticSize.X}
 					BackgroundColor3={Mocha.Base}
 					Event={{
 						MouseButton1Click: () => {
@@ -83,7 +94,12 @@ export default (props: CommonProps) => {
 				>
 					<uicorner CornerRadius={new UDim(0.25, 0)} />
 					<Padding Size={15} />
-					<Center FillDirection={Enum.FillDirection.Horizontal} Padding={new UDim(0.05, 0)} />
+					<uilistlayout
+						HorizontalAlignment={Enum.HorizontalAlignment.Left}
+						VerticalAlignment={Enum.VerticalAlignment.Center}
+						FillDirection={Enum.FillDirection.Horizontal}
+						Padding={new UDim(0.05, 0)}
+					/>
 
 					<imagelabel
 						Size={UDim2.fromScale(1, 1)}
@@ -99,6 +115,7 @@ export default (props: CommonProps) => {
 						Text={subInteraction.name}
 						Size={UDim2.fromScale(0.8, 1)}
 						TextSize={35}
+						CustomTextScaled={true}
 						TextXAlignment={Enum.TextXAlignment.Left}
 						TextColor3={Mocha.Text}
 						AutomaticSize={Enum.AutomaticSize.X}
@@ -151,13 +168,17 @@ export default (props: CommonProps) => {
 		);
 
 		interactions.forEach((interaction: Instance) => {
-			if (!interaction.IsA("BasePart"))
+			if (!interaction.IsA("BasePart") && !interaction.IsA("Model"))
 				error(
-					`${interaction.Name} has an incorrect type to be an interaction, accepted type is BasePart, got ${interaction.ClassName}`,
+					`${interaction.Name} has an incorrect type to be an interaction, accepted types are BasePart and Model, got ${interaction.ClassName}`,
 				);
 
 			if (interaction.GetAttribute("interactionType") === undefined)
 				error(`${interaction.Name} lacks the interactionType attribute!`);
+
+			if (interaction.IsA("Model")) {
+				maid.GiveTask(interactionModelMock(interaction));
+			}
 		});
 
 		maid.GiveTask(

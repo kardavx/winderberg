@@ -1,10 +1,11 @@
 import { clientProducer } from "shared/module/clientPlayerData";
 import { icons } from "./notificationData";
+import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
 
 interface SubInteraction {
 	name: string;
 	icon?: string;
-	functionality: (adornee: BasePart) => void;
+	functionality: (adornee: AllowedInteractionInstances) => void;
 }
 
 interface Interactions {
@@ -44,6 +45,33 @@ const interactionData: Interactions = {
 					description: `Obrabowałeś bankomat pomyślnie, otrzymujesz 430$`,
 					icon: "crime",
 				});
+			},
+		},
+	],
+	Car: [
+		{
+			name: "Ukradnij",
+			icon: icons.crime,
+			functionality: () => {
+				clientProducer.pushNotification({
+					title: "Rabunek",
+					description: `Zostaw to auto zlodzieju!!!`,
+					icon: "crime",
+				});
+			},
+		},
+	],
+	Player: [
+		{
+			name: "Pokaż ID",
+			functionality: () => {
+				print("pokazuje");
+			},
+		},
+		{
+			name: "Pokaż licencje kierowcy",
+			functionality: () => {
+				print("pokazuje");
 			},
 		},
 	],

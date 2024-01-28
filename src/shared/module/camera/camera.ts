@@ -121,6 +121,23 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 		),
 	);
 
+	let cursorLocked = false;
+	maid.GiveTask(
+		OnKeyClicked(
+			"unlockCursor",
+			() => {
+				if (cursorLocked) {
+					cursorLocked = false;
+					clientProducer.removeMouseEnabler("unlockCursor");
+				} else {
+					cursorLocked = true;
+					clientProducer.addMouseEnabler("unlockCursor");
+				}
+			},
+			Enum.KeyCode.Z,
+		),
+	);
+
 	ContextActionService.BindAction(
 		"cameraMouseDeltaProcess",
 		(_, inputState: Enum.UserInputState, inputObject: InputObject) => {
