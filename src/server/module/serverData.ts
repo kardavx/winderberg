@@ -2,19 +2,17 @@ import { Connection, Signal } from "@rbxts/beacon";
 import { Document, createCollection } from "@rbxts/lapis";
 import Maid from "@rbxts/maid";
 import { Players } from "@rbxts/services";
-import { t } from "@rbxts/t";
+import { $terrify } from "rbxts-transformer-t-new";
 import dataConfig from "shared/config/dataConfig";
 import network from "shared/network/network";
 import {
 	saveExceptions as profileSaveExceptions,
 	CreateProducer as createProfileProducer,
 	defaultState as defaultProfileState,
-	runtimeStateValidation as profileRuntimeStateValidation,
 	State as profileState,
 } from "shared/reflex/serverProfile";
 import {
 	defaultState as defaultServerState,
-	runtimeStateValidation as serverRuntimeStateValidation,
 	CreateProducer as createServerProducer,
 	saveExceptions as serverSaveExceptions,
 	State as serverProdState,
@@ -24,12 +22,12 @@ import { ServerPlayerProfile, ServerState } from "shared/types/StateTypes";
 
 const profilesCollection = createCollection("playerProfiles", {
 	defaultData: defaultProfileState,
-	validate: t.strictInterface(profileRuntimeStateValidation),
+	validate: $terrify<profileState>(),
 });
 
 const stateCollection = createCollection("serverStates", {
 	defaultData: defaultServerState,
-	validate: t.strictInterface(serverRuntimeStateValidation),
+	validate: $terrify<serverProdState>(),
 });
 
 const playerDataLoadedEvent: Signal<[Player, ServerPlayerProfile]> = new Signal();
@@ -95,17 +93,20 @@ const serverData: InitializerFunction = () => {
 		.andThen((document) => {
 			const correctDocumentType = document as Document<serverProdState>;
 
-			const state = {
+			const state: ServerState = {
 				producer: createServerProducer(correctDocumentType.read()),
 				document: correctDocumentType,
-				nextActionIsReplicated: false,
 			};
 
 			const replicateMiddleware = () => {
 				return (dispatch: (...args: unknown[]) => unknown, name: string) =>
 					(...args: unknown[]) => {
-						if (state.nextActionIsReplicated) {
-							state.nextActionIsReplicated = false;
+						if (state.changedBy) {
+							network.GetReplicatedState.fireAllExcept(state.changedBy, {
+								name: name,
+								arguments: args,
+							});
+							state.changedBy = undefined;
 							return dispatch(args);
 						}
 
@@ -238,7 +239,7 @@ const serverData: InitializerFunction = () => {
 
 			if (!serverState) return;
 
-			serverState.nextActionIsReplicated = true;
+			serverState.changedBy = player;
 			(serverState.producer as unknown as withCallSignature)[data.name](...data.arguments);
 		}),
 	);

@@ -12,9 +12,9 @@ interface HumanoidWithAnimator extends Humanoid {
 interface Character extends Model {
 	PrimaryPart: BasePart;
 	Humanoid: HumanoidWithAnimator;
-	HumanoidRootPart: BasePart;
-
-	UpperTorso: BasePart & {
-		Waist: Motor6D;
+	HumanoidRootPart: BasePart & {
+		RootJoint: Motor6D;
 	};
+
+	Torso: BasePart;
 }

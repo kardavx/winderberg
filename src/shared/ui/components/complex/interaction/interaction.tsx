@@ -10,20 +10,24 @@ import { lerp } from "@rbxts/pretty-react-hooks";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import { Mocha } from "@rbxts/catppuccin";
-import interactionData, { defaultIcon } from "shared/data/interactionData";
+import interactionData, { defaultIcon, maxInteractionDistance } from "shared/data/interactionData";
 import Center from "../../base/Center";
 import Padding from "../../base/Padding";
 import Text from "../../base/Text";
+import LocalPlayer from "shared/util/LocalPlayer";
 
 const getFocusedInteraction = (): BasePart | undefined => {
+	const FilterDescendantsInstances: Instance[] = [CurrentCamera];
+	if (LocalPlayer.Character) FilterDescendantsInstances.push(LocalPlayer.Character);
+
 	const raycastParams = new RaycastParams();
 	raycastParams.IgnoreWater = false;
-	raycastParams.FilterDescendantsInstances = [CurrentCamera];
+	raycastParams.FilterDescendantsInstances = FilterDescendantsInstances;
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude;
 
 	const raycastResult = Workspace.Raycast(
 		CurrentCamera.CFrame.Position,
-		CurrentCamera.CFrame.LookVector.mul(100),
+		CurrentCamera.CFrame.LookVector.mul(maxInteractionDistance),
 		raycastParams,
 	);
 
@@ -45,6 +49,7 @@ export default (props: CommonProps) => {
 	>;
 
 	const [shownFactor, setShownFactor] = useSpring({ initialValue: 0, stiffness: 70, dampening: 20 });
+	const [hoveringFactor, setHoveringFactor] = useSpring({ initialValue: 0, stiffness: 120, dampening: 20 });
 	const [interactingWithFactor, setInteractingWithFactor] = useSpring({
 		initialValue: 0,
 		stiffness: 70,
@@ -107,9 +112,14 @@ export default (props: CommonProps) => {
 
 	setLastInteractingWith(interactingWith);
 
+	if (interactingWith) {
+		props.clientState.addMouseEnabler("interactingWith");
+	} else {
+		props.clientState.removeMouseEnabler("interactingWith");
+	}
+
 	Roact.useEffect(() => {
 		const maid = new Maid();
-		const highlights: Highlight[] = [];
 
 		maid.GiveTask(
 			OnKeyHeld(
@@ -148,25 +158,16 @@ export default (props: CommonProps) => {
 
 			if (interaction.GetAttribute("interactionType") === undefined)
 				error(`${interaction.Name} lacks the interactionType attribute!`);
-
-			const highlight = interactionHighlight();
-			highlight.Parent = interaction;
-			highlights.push(highlight);
-			maid.GiveTask(highlight);
 		});
 
 		maid.GiveTask(
 			clientSignals.onRender.Connect((deltaTime: number) => {
-				highlights.forEach((highlight: Highlight) => {
-					highlight.FillTransparency = lerp(1, 0.25, shownFactor.getValue());
-					highlight.OutlineTransparency = lerp(1, 0.25, shownFactor.getValue());
-				});
-
-				if (interactingWith) {
-					const currentlyFocusedInteraction = getFocusedInteraction();
-					if (currentlyFocusedInteraction !== interactingWith) {
-						setInteractingWith(undefined);
-					}
+				const currentlyFocusedInteraction = getFocusedInteraction();
+				if (currentlyFocusedInteraction !== undefined) {
+					setHoveringFactor(1);
+				} else {
+					setHoveringFactor(0);
+					if (interactingWith) setInteractingWith(undefined);
 				}
 			}),
 		);
@@ -182,7 +183,9 @@ export default (props: CommonProps) => {
 				Image={"rbxassetid://13321848320"}
 				Size={UDim2.fromScale(0.1, 0.1)}
 				AnchorPoint={new Vector2(0.5, 0.5)}
-				ImageColor3={Mocha.Text}
+				ImageColor3={hoveringFactor.map((factor: number) => {
+					return Mocha.Text.Lerp(Mocha.Blue, factor);
+				})}
 				ImageTransparency={shownFactor.map((factor: number) => {
 					return 1 - factor;
 				})}

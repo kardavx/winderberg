@@ -1,7 +1,4 @@
-import { Producer, createProducer } from "@rbxts/reflex";
-import { t } from "@rbxts/t";
-
-export type ProfileProducer = Producer<State, Actions>;
+import { createProducer } from "@rbxts/reflex";
 
 export interface State {
 	count: number;
@@ -15,13 +12,9 @@ export const defaultState: State = {
 	count: 0,
 };
 
-export const runtimeStateValidation: { [key in keyof State]: t.check<unknown> } = {
-	count: t.number,
-};
-
 export const saveExceptions: (keyof State)[] = [];
 
-export const CreateProducer = (initialState: State): Producer<State, Actions> => {
+export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
 		increment: (oldState: State): State => {
 			const state = table.clone(oldState);
@@ -31,5 +24,7 @@ export const CreateProducer = (initialState: State): Producer<State, Actions> =>
 		},
 	});
 
-	return producer as unknown as Producer<State, Actions>;
+	return producer;
 };
+
+export type ProfileProducer = ReturnType<typeof CreateProducer>;

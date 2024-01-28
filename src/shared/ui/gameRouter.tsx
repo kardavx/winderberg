@@ -8,6 +8,9 @@ import { CommonProps } from "shared/types/UITypes";
 import Menu from "./components/complex/menu/menu";
 import Interaction from "./components/complex/interaction/interaction";
 import reactConditional from "./util/reactConditional";
+import HudRouter from "./components/complex/hud/hudRouter";
+import CurrentCamera from "shared/util/CurrentCamera";
+import clientSignals from "shared/signal/clientSignals";
 
 export default (props: {
 	clientState: ClientProducer;
@@ -16,14 +19,33 @@ export default (props: {
 }) => {
 	const isLoaded = props.serverProfile !== undefined && props.serverState !== undefined;
 
+	const [viewportSize, setViewportSize] = Roact.useState(CurrentCamera.ViewportSize);
+	const commonProps = { ...props } as CommonProps;
+
+	print(viewportSize);
+
+	Roact.useEffect(() => {
+		const connection = clientSignals.onRender.Connect((deltaTime: number) => {
+			const newSize = CurrentCamera.ViewportSize;
+			if (viewportSize === newSize) return;
+
+			setViewportSize(newSize);
+		});
+
+		return () => {
+			connection.Disconnect();
+		};
+	});
+
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
 			{reactConditional(
 				isLoaded,
 				<Fragment>
-					<Debug {...(props as CommonProps)} />
-					<Interaction {...(props as CommonProps)} />
-					{/* <Menu {...(props as CommonProps)} /> */}
+					<Debug {...commonProps} />
+					<Interaction {...commonProps} />
+					<HudRouter {...commonProps} />
+					{/* <Menu {...commonProps} /> */}
 				</Fragment>,
 			)}
 

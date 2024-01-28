@@ -6,6 +6,7 @@ import gameSignals from "shared/signal/clientSignals";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import lerpNumber from "shared/util/lerpNumber";
+import { clientProducer } from "../clientPlayerData";
 
 const updateOrientation = (
 	orientation: Vector2,
@@ -31,10 +32,15 @@ const getActualZOffset = (
 	currentZOffset: number,
 	deltaTime: number,
 ): number => {
-	const raycastResult = Workspace.Raycast(facing.Position, facing.LookVector.mul(-targetZOffset), raycastParams);
+	const raycastResult = Workspace.Blockcast(
+		facing,
+		new Vector3(0.1, 0.1, 0.1),
+		facing.LookVector.mul(-targetZOffset),
+		raycastParams,
+	);
 
 	if (raycastResult) {
-		const amountToSubtract = targetZOffset - raycastResult.Distance + 1;
+		const amountToSubtract = targetZOffset - raycastResult.Distance;
 		const newZOffset = targetZOffset - amountToSubtract;
 		const slowPan = newZOffset > currentZOffset;
 
@@ -44,11 +50,15 @@ const getActualZOffset = (
 	return lerpNumber(currentZOffset, targetZOffset, 6 * deltaTime);
 };
 
+const mouseUnlockedToBehavior = (mouseUnlocked: boolean): Enum.MouseBehavior => {
+	return mouseUnlocked ? Enum.MouseBehavior.Default : Enum.MouseBehavior.LockCenter;
+};
+
 const camera: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
 
 	const cameraObstructionParams = new RaycastParams();
-	cameraObstructionParams.FilterDescendantsInstances = [character];
+	cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera];
 	cameraObstructionParams.IgnoreWater = false;
 	cameraObstructionParams.FilterType = Enum.RaycastFilterType.Exclude;
 
@@ -58,26 +68,33 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 	let orientation = Vector2.zero;
 	let currentZOffset = zOffset;
 
+	const desiredOffset = new CFrame(1, 1, 0);
+
 	maid.GiveTask(
 		gameSignals.onRender.Connect((deltaTime: number) => {
+			const currentState = clientProducer.getState();
+			const isMouseUnlocked = currentState.mouseEnablers.size() > 0;
+
+			UserInputService.MouseIconEnabled = isMouseUnlocked;
+
 			if (CurrentCamera.CameraType !== Enum.CameraType.Scriptable) {
 				CurrentCamera.CameraType = Enum.CameraType.Scriptable;
 			}
 
-			// if (UserInputService.MouseBehavior !== Enum.MouseBehavior.LockCenter) {
-			// 	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter;
-			// }
+			if (UserInputService.MouseBehavior !== mouseUnlockedToBehavior(isMouseUnlocked)) {
+				UserInputService.MouseBehavior = mouseUnlockedToBehavior(isMouseUnlocked);
+			}
 
 			const cameraSubject = character.HumanoidRootPart.Position;
 			const baseCFrame = new CFrame(cameraSubject).mul(
 				CFrame.fromEulerAnglesYXZ(math.rad(orientation.Y), math.rad(orientation.X), 0),
 			);
 
-			const offsetedCFrame = baseCFrame.mul(new CFrame(1, character.Humanoid.HipHeight / 2, 0));
+			const offsetedCFrame = baseCFrame.mul(desiredOffset);
 			const cframeWithModifiers = offsetedCFrame.mul(cameraModifier.getOffsets());
 
 			currentZOffset = getActualZOffset(
-				cframeWithModifiers,
+				cframeWithModifiers.mul(new CFrame(0, -desiredOffset.Position.Y, 0)),
 				cameraObstructionParams,
 				zOffset * cameraConfig.zOffsetMultipliers[zOffsetMultiplierIndex],
 				currentZOffset,
@@ -118,6 +135,7 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 		ContextActionService.UnbindAction("cameraMouseDeltaProcess");
 		CurrentCamera.CameraType = Enum.CameraType.Custom;
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default;
+		UserInputService.MouseIconEnabled = true;
 	});
 
 	return () => {

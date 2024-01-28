@@ -42,6 +42,8 @@ const replicateProfileMiddleware = () => {
 				return dispatch(args);
 			}
 
+			print("replicating profile");
+
 			network.ReplicateProfile.fire({
 				name: name,
 				arguments: args,
@@ -58,6 +60,8 @@ const replicateStateMiddleware = () => {
 				nextStateActionIsReplicated = false;
 				return dispatch(args);
 			}
+
+			print("replicating state");
 
 			network.ReplicateState.fire({
 				name: name,

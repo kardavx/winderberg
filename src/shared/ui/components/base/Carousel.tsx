@@ -106,6 +106,7 @@ export default (props: Props) => {
 						Size={UDim2.fromScale(1, 0.5)}
 						TextXAlignment={Enum.TextXAlignment.Left}
 						Weight="Bold"
+						TextSize={20}
 						TextColor3={Mocha.Text}
 						Text={props.Images[imageIndex].title}
 					/>
@@ -113,6 +114,7 @@ export default (props: Props) => {
 					<Text
 						Size={UDim2.fromScale(1, 0.5)}
 						TextColor3={Mocha.Subtext1}
+						TextSize={20}
 						TextXAlignment={Enum.TextXAlignment.Left}
 						Text={props.Images[imageIndex].description}
 					/>

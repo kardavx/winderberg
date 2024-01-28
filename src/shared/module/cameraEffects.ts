@@ -14,7 +14,7 @@ const cameraEffects: CharacterInitializerFunction = (character: Character) => {
 
 	maid.GiveTask(
 		gameSignals.onRender.Connect((deltaTime: number) => {
-			const upperTorsoTransform = character.UpperTorso.Waist.Transform;
+			const upperTorsoTransform = character.HumanoidRootPart.RootJoint.Transform;
 			const [x, y, z] = upperTorsoTransform.ToOrientation();
 			torsoTransformModifier.set(CFrame.Angles(x * effectStrength, y * effectStrength, z * effectStrength));
 		}),

@@ -12,5 +12,5 @@ export interface ServerPlayerProfile {
 export interface ServerState {
 	producer: ServerProducer;
 	document: Document<serverState>;
-	nextActionIsReplicated: boolean;
+	changedBy?: Player;
 }

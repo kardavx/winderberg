@@ -8,6 +8,12 @@ import useProducerAsState from "../util/useProducerAsState";
 export default (props: CommonProps) => {
 	const [isShown, setIsShown] = Roact.useState(false);
 
+	if (isShown) {
+		props.clientState.addMouseEnabler("debug");
+	} else {
+		props.clientState.removeMouseEnabler("debug");
+	}
+
 	const [clientCount] = useProducerAsState(props.clientState, (state) => {
 		return state.count;
 	});
@@ -43,19 +49,33 @@ export default (props: CommonProps) => {
 			<DebugButton
 				Text={tostring(clientCount)}
 				Callback={() => {
-					(props.clientState.increment as () => void)();
+					props.clientState.increment();
 				}}
 			/>
 			<DebugButton
 				Text={tostring(profileCount)}
 				Callback={() => {
-					(props.serverProfile.increment as () => void)();
+					props.serverProfile.increment();
 				}}
 			/>
 			<DebugButton
 				Text={tostring(serverCount)}
 				Callback={() => {
-					(props.serverState.increment as () => void)();
+					props.serverState.increment();
+				}}
+			/>
+			<DebugButton
+				Text={"Push test notification"}
+				Callback={() => {
+					props.clientState.pushNotification({
+						title: "DEBUG",
+						description:
+							"To jest testowe powiadomienie mające na celu przetestowania czegoś, chuj ci w dupe łukasz",
+						icon: "crime",
+						callback: () => {
+							print("i was clicked!");
+						},
+					});
 				}}
 			/>
 		</frame>

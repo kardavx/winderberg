@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rbxtsc",
-    "watch": "rbxtsc rbxtsc -w"
+    "prewatch": "rbxtsc",
+    "watch": "rbxtsc -w"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +26,8 @@
     "@rbxts/services": "^1.5.3",
     "@rbxts/set-timeout": "^1.1.2",
     "@rbxts/spr": "^2.1.1",
-    "@rbxts/t": "^3.1.0"
+    "@rbxts/t": "^3.1.0",
+    "rbxts-transformer-t-new": "^1.1.5"
   },
   "devDependencies": {
     "@rbxts/compiler-types": "^2.2.0-types.0",
