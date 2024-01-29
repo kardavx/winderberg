@@ -5,6 +5,7 @@ import { ServerProducer, State as serverState } from "shared/reflex/serverState"
 export interface ServerPlayerProfile {
 	player: Player;
 	document: Document<profileState>;
+	subscription: () => void;
 	producer: ProfileProducer;
 	nextActionIsReplicated: boolean;
 }
@@ -12,5 +13,6 @@ export interface ServerPlayerProfile {
 export interface ServerState {
 	producer: ServerProducer;
 	document: Document<serverState>;
+	subscription: () => void;
 	changedBy?: Player;
 }

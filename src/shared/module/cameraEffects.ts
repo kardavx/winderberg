@@ -2,7 +2,7 @@ import Maid from "@rbxts/maid";
 import cameraModifier from "shared/class/cameraModifier";
 import gameSignals from "shared/signal/clientSignals";
 
-const effectStrength = 0.025;
+const effectStrength = 0.1;
 
 const cameraEffects: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
@@ -14,9 +14,13 @@ const cameraEffects: CharacterInitializerFunction = (character: Character) => {
 
 	maid.GiveTask(
 		gameSignals.onRender.Connect((deltaTime: number) => {
-			const upperTorsoTransform = character.HumanoidRootPart.RootJoint.Transform;
-			const [x, y, z] = upperTorsoTransform.ToOrientation();
-			torsoTransformModifier.set(CFrame.Angles(x * effectStrength, y * effectStrength, z * effectStrength));
+			if (character.HumanoidRootPart) {
+				const upperTorsoTransform = character.HumanoidRootPart.RootJoint.Transform;
+				const [x, y, z] = upperTorsoTransform.ToOrientation();
+				torsoTransformModifier.set(CFrame.Angles(x * effectStrength, y * effectStrength, z * effectStrength));
+			} else {
+				torsoTransformModifier.set(CFrame.identity);
+			}
 		}),
 	);
 

@@ -31,8 +31,6 @@ export = (target: ScreenGui): (() => void) => {
 		root.render(
 			Roact.createElement(gameRouter, {
 				clientState: clientStateProducer,
-				serverProfile: serverProfileProducer,
-				serverState: serverStateProducer,
 			}),
 		);
 

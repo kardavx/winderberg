@@ -2,9 +2,11 @@ import { Connection, Signal } from "@rbxts/beacon";
 import { Document, createCollection } from "@rbxts/lapis";
 import Maid from "@rbxts/maid";
 import { Players } from "@rbxts/services";
+import { t } from "@rbxts/t";
 import { $terrify } from "rbxts-transformer-t-new";
 import dataConfig from "shared/config/dataConfig";
 import network from "shared/network/network";
+import reconcileMigration from "shared/reflex/migrations/reconcileMigration";
 import {
 	saveExceptions as profileSaveExceptions,
 	CreateProducer as createProfileProducer,
@@ -22,11 +24,21 @@ import { ServerPlayerProfile, ServerState } from "shared/types/StateTypes";
 
 const profilesCollection = createCollection("playerProfiles", {
 	defaultData: defaultProfileState,
+	migrations: [
+		(data) => {
+			return reconcileMigration<profileState>(data as Partial<profileState>, defaultProfileState);
+		},
+	],
 	validate: $terrify<profileState>(),
 });
 
 const stateCollection = createCollection("serverStates", {
 	defaultData: defaultServerState,
+	migrations: [
+		(data) => {
+			return reconcileMigration<serverProdState>(data as Partial<serverProdState>, defaultServerState);
+		},
+	],
 	validate: $terrify<serverProdState>(),
 });
 
@@ -93,8 +105,18 @@ const serverData: InitializerFunction = () => {
 		.andThen((document) => {
 			const correctDocumentType = document as Document<serverProdState>;
 
+			const producer = createServerProducer(correctDocumentType.read());
+
 			const state: ServerState = {
-				producer: createServerProducer(correctDocumentType.read()),
+				producer: producer,
+				subscription: producer.subscribe(
+					(state) => {
+						return state;
+					},
+					(newValue) => {
+						state.document.write(getDataToSave(newValue, serverSaveExceptions));
+					},
+				),
 				document: correctDocumentType,
 			};
 
@@ -124,7 +146,6 @@ const serverData: InitializerFunction = () => {
 			serverDataLoadedEvent.Fire(serverState);
 
 			state.document.beforeClose(() => {
-				state.document.write(getDataToSave(state.producer.getState(), serverSaveExceptions));
 				serverState = undefined;
 			});
 		})
@@ -138,8 +159,6 @@ const serverData: InitializerFunction = () => {
 
 	maid.GiveTask(
 		serverSignals.playerAdded.Connect((player: Player) => {
-			print("loading player");
-
 			profilesCollection
 				.load(`playerProfile_${player.UserId}_${dataConfig.playerProfileKey}`, [player.UserId])
 				.andThen((document) => {
@@ -148,10 +167,20 @@ const serverData: InitializerFunction = () => {
 					if (!player.Parent) {
 						document.close().catch(warn);
 					} else {
+						const producer = createProfileProducer(correctDocumentType.read());
+
 						const profile: ServerPlayerProfile = {
 							player: player,
 							document: correctDocumentType,
-							producer: createProfileProducer(correctDocumentType.read()),
+							subscription: producer.subscribe(
+								(state) => {
+									return state;
+								},
+								(newState) => {
+									profile.document.write(getDataToSave(newState, profileSaveExceptions));
+								},
+							),
+							producer: producer,
 							nextActionIsReplicated: false,
 						};
 
@@ -189,8 +218,8 @@ const serverData: InitializerFunction = () => {
 			const profile = playerProfiles[player.Name];
 
 			if (profile) {
-				profile.document.write(getDataToSave(profile.producer.getState(), profileSaveExceptions));
 				profile.document.close().catch(warn);
+				profile.subscription();
 				playerProfiles[player.Name] = undefined;
 			}
 		}),

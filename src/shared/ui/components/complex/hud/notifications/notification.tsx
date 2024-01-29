@@ -58,14 +58,14 @@ export default (props: Props) => {
 				</frame>
 			</frame>
 			<frame Size={UDim2.fromScale(0.65, 1)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1}>
-				<uilistlayout VerticalAlignment={Enum.VerticalAlignment.Bottom} />
+				<uilistlayout VerticalAlignment={Enum.VerticalAlignment.Center} />
 				<Text
 					Size={UDim2.fromScale(1, 0)}
 					TextColor3={Mocha.Text}
-					TextSize={35}
+					TextSize={25}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					CustomTextScaled={true}
-					TextYAlignment={Enum.TextYAlignment.Bottom}
+					TextYAlignment={Enum.TextYAlignment.Center}
 					TextXAlignment={Enum.TextXAlignment.Left}
 					Text={string.upper(props.title)}
 					Weight="Bold"
@@ -76,9 +76,9 @@ export default (props: Props) => {
 					CustomTextScaled={true}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					TextWrapped={true}
-					TextYAlignment={Enum.TextYAlignment.Top}
+					TextYAlignment={Enum.TextYAlignment.Center}
 					TextXAlignment={Enum.TextXAlignment.Left}
-					TextSize={25}
+					TextSize={20}
 					Text={props.description}
 				/>
 			</frame>

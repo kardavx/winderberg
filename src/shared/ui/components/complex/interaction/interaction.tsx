@@ -93,7 +93,7 @@ export default (props: CommonProps) => {
 					}}
 				>
 					<uicorner CornerRadius={new UDim(0.25, 0)} />
-					<Padding Size={15} />
+					<Padding Size={10} />
 					<uilistlayout
 						HorizontalAlignment={Enum.HorizontalAlignment.Left}
 						VerticalAlignment={Enum.VerticalAlignment.Center}
@@ -114,7 +114,7 @@ export default (props: CommonProps) => {
 					<Text
 						Text={subInteraction.name}
 						Size={UDim2.fromScale(0.8, 1)}
-						TextSize={35}
+						TextSize={25}
 						CustomTextScaled={true}
 						TextXAlignment={Enum.TextXAlignment.Left}
 						TextColor3={Mocha.Text}
@@ -202,7 +202,7 @@ export default (props: CommonProps) => {
 		<Fragment>
 			<imagelabel
 				Image={"rbxassetid://13321848320"}
-				Size={UDim2.fromScale(0.1, 0.1)}
+				Size={UDim2.fromScale(0.06, 0.06)}
 				AnchorPoint={new Vector2(0.5, 0.5)}
 				ImageColor3={hoveringFactor.map((factor: number) => {
 					return Mocha.Text.Lerp(Mocha.Blue, factor);
@@ -222,11 +222,11 @@ export default (props: CommonProps) => {
 				GroupTransparency={interactingWithFactor.map((factor: number) => 1 - factor)}
 				AnchorPoint={new Vector2(0.5, 0.5)}
 				Position={interactingWithFactor.map((factor: number) => {
-					return UDim2.fromScale(0.62, 0.5).Lerp(UDim2.fromScale(0.63, 0.5), factor);
+					return UDim2.fromScale(0.575, 0.5).Lerp(UDim2.fromScale(0.585, 0.5), factor);
 				})}
 			>
 				<Center />
-				<frame Size={UDim2.fromScale(0.2, 0.075)} BackgroundTransparency={1}>
+				<frame Size={UDim2.fromScale(0.13, 0.045)} BackgroundTransparency={1}>
 					<uilistlayout Padding={new UDim(0.1, 0)} />
 					{...lastRenderedSubInteractions}
 				</frame>

@@ -22,6 +22,10 @@ export default (props: CommonProps) => {
 		return state.count;
 	});
 
+	const [profileTest] = useProducerAsState(props.serverProfile, (state) => {
+		return state.test;
+	});
+
 	const [serverCount] = useProducerAsState(props.serverState, (state) => {
 		return state.count;
 	});
@@ -53,7 +57,7 @@ export default (props: CommonProps) => {
 				}}
 			/>
 			<DebugButton
-				Text={tostring(profileCount)}
+				Text={`${profileTest}_${tostring(profileCount)}`}
 				Callback={() => {
 					props.serverProfile.increment();
 				}}
@@ -71,6 +75,34 @@ export default (props: CommonProps) => {
 						title: "DEBUG",
 						description:
 							"To jest testowe powiadomienie mające na celu przetestowania czegoś, chuj ci w dupe łukasz",
+						icon: "crime",
+						callback: () => {
+							print("i was clicked!");
+						},
+					});
+				}}
+			/>
+			<DebugButton
+				Text={"Push test notification"}
+				Callback={() => {
+					props.clientState.pushNotification({
+						title: "DEBUG",
+						description:
+							"To jest testowe powiadomienie mające na celu przetestowania czegoś, chuj ci w dupe łukasz lorem ipsum lorem ipsum lorem ipsum  lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsum",
+						icon: "crime",
+						callback: () => {
+							print("i was clicked!");
+						},
+					});
+				}}
+			/>
+			<DebugButton
+				Text={"Push test notification"}
+				Callback={() => {
+					props.clientState.pushNotification({
+						title: "DEBUG",
+						description:
+							"Essa",
 						icon: "crime",
 						callback: () => {
 							print("i was clicked!");

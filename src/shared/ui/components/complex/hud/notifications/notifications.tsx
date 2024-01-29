@@ -46,17 +46,6 @@ export default (props: CommonProps) => {
 			/>
 
 			{...renderedNotifications}
-			{/* <Notification
-				title="Debug"
-				description="To jest bardzo, bardzo, bardzo, bardzo dlugie powiadomienie majace na celu pokazanie ze sie elegancko to gowno skaluje niezaleznie od wszystkiego lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum"
-				icon={"crime"}
-			/>
-			<Notification
-				title="Rabunek"
-				description="Zostałeś okradziony przez BainesMcLOVE, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum"
-				icon={"crime"}
-			/>
-			<Notification title="Siła" description="Twój poziom siły wzrasta" icon={"strength"} /> */}
 		</frame>
 	);
 };

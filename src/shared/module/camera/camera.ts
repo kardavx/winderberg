@@ -1,5 +1,5 @@
 import Maid from "@rbxts/maid";
-import { ContextActionService, UserInputService, Workspace } from "@rbxts/services";
+import { CollectionService, ContextActionService, UserInputService, Workspace } from "@rbxts/services";
 import cameraModifier from "shared/class/cameraModifier";
 import cameraConfig from "shared/config/cameraConfig";
 import gameSignals from "shared/signal/clientSignals";
@@ -7,6 +7,13 @@ import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import lerpNumber from "shared/util/lerpNumber";
 import { clientProducer } from "../clientPlayerData";
+import ignoredRaycastTags from "shared/data/ignoredRaycastTags";
+import roundVector from "shared/util/roundVector";
+import unnanifyVector from "shared/util/unnanifyVector";
+
+let moveDirection = Vector3.zero;
+
+export const getMoveDirection = () => moveDirection;
 
 const updateOrientation = (
 	orientation: Vector2,
@@ -57,8 +64,15 @@ const mouseUnlockedToBehavior = (mouseUnlocked: boolean): Enum.MouseBehavior => 
 const camera: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
 
+	const ignored: Instance[] = [];
+	ignoredRaycastTags.forEach((tag: string) => {
+		CollectionService.GetTagged(tag).forEach((tagged) => {
+			ignored.push(tagged);
+		});
+	});
+
 	const cameraObstructionParams = new RaycastParams();
-	cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera];
+	cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera, ...ignored];
 	cameraObstructionParams.IgnoreWater = false;
 	cameraObstructionParams.FilterType = Enum.RaycastFilterType.Exclude;
 
@@ -73,7 +87,9 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 	maid.GiveTask(
 		gameSignals.onRender.Connect((deltaTime: number) => {
 			const currentState = clientProducer.getState();
+
 			const isMouseUnlocked = currentState.mouseEnablers.size() > 0;
+			const isCameraLocked = currentState.lockEnablers.size() > 0;
 
 			UserInputService.MouseIconEnabled = isMouseUnlocked;
 
@@ -90,6 +106,18 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 				CFrame.fromEulerAnglesYXZ(math.rad(orientation.Y), math.rad(orientation.X), 0),
 			);
 
+			if (isCameraLocked) {
+				moveDirection = roundVector(
+					unnanifyVector(
+						new CFrame(cameraSubject)
+							.mul(CFrame.Angles(0, math.rad(orientation.X), 0))
+							.VectorToObjectSpace(character.Humanoid.MoveDirection).Unit,
+					),
+				);
+			} else {
+				moveDirection = new Vector3(0, 0, -math.sign(character.Humanoid.MoveDirection.Magnitude));
+			}
+
 			const offsetedCFrame = baseCFrame.mul(desiredOffset);
 			const cframeWithModifiers = offsetedCFrame.mul(cameraModifier.getOffsets());
 
@@ -104,6 +132,11 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 
 			CurrentCamera.CFrame = ZoffsetedCFrame;
 			CurrentCamera.Focus = baseCFrame;
+
+			if (isCameraLocked) {
+				const [x, y, z] = baseCFrame.ToOrientation();
+				character.PrimaryPart.CFrame = new CFrame(character.PrimaryPart.Position).mul(CFrame.Angles(0, y, 0));
+			}
 		}),
 	);
 

@@ -1,4 +1,6 @@
+const versionPrefix = `19`;
+
 export default {
-	serverStateKey: `wynderberg_data_3`,
-	playerProfileKey: `dev_data_3`,
+	serverStateKey: `wynderberg_data_${versionPrefix}`,
+	playerProfileKey: `dev_data_${versionPrefix}`,
 };

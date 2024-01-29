@@ -1,5 +1,5 @@
 import Maid from "@rbxts/maid";
-import { RunService } from "@rbxts/services";
+import { RunService, StarterGui } from "@rbxts/services";
 import clientInterface from "shared/module/clientInterface";
 import gameSignals from "shared/signal/clientSignals";
 import LocalPlayer from "shared/util/LocalPlayer";
@@ -7,13 +7,21 @@ import camera from "shared/module/camera/camera";
 import movement from "shared/module/movement";
 import cameraEffects from "shared/module/cameraEffects";
 import clientPlayerData from "shared/module/clientPlayerData";
+import animate from "shared/module/animate";
+
+StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.All, false);
 
 const maid = new Maid();
 const characterMaid = new Maid();
 
 const onCharacterAdded = (character: Character) => {
 	characterMaid.DoCleaning();
+
+	character.WaitForChild("HumanoidRootPart");
+	character.WaitForChild("Humanoid");
+
 	characterMaid.GiveTask(camera(character));
+	characterMaid.GiveTask(animate(character));
 	characterMaid.GiveTask(cameraEffects(character));
 	characterMaid.GiveTask(movement(character));
 };

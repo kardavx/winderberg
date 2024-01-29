@@ -22,8 +22,6 @@ export default (props: {
 	const [viewportSize, setViewportSize] = Roact.useState(CurrentCamera.ViewportSize);
 	const commonProps = { ...props } as CommonProps;
 
-	print(viewportSize);
-
 	Roact.useEffect(() => {
 		const connection = clientSignals.onRender.Connect((deltaTime: number) => {
 			const newSize = CurrentCamera.ViewportSize;
