@@ -62,7 +62,7 @@ export default (props: Props) => {
 				<Text
 					Size={UDim2.fromScale(1, 0)}
 					TextColor3={Mocha.Text}
-					TextSize={25}
+					TextSize={20}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					CustomTextScaled={true}
 					TextYAlignment={Enum.TextYAlignment.Center}
@@ -78,7 +78,7 @@ export default (props: Props) => {
 					TextWrapped={true}
 					TextYAlignment={Enum.TextYAlignment.Center}
 					TextXAlignment={Enum.TextXAlignment.Left}
-					TextSize={20}
+					TextSize={18}
 					Text={props.description}
 				/>
 			</frame>

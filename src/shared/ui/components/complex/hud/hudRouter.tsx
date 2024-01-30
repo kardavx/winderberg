@@ -8,6 +8,7 @@ import Health from "./bars/health";
 import Stamina from "./bars/stamina";
 import Hunger from "./bars/hunger";
 import Thirst from "./bars/thirst";
+import Chat from "./chat/chat";
 
 export default (props: CommonProps) => {
 	return (
@@ -16,13 +17,34 @@ export default (props: CommonProps) => {
 				<uilistlayout
 					Padding={new UDim(0.02, 0)}
 					VerticalAlignment={Enum.VerticalAlignment.Bottom}
-					HorizontalAlignment={Enum.HorizontalAlignment.Center}
+					HorizontalAlignment={Enum.HorizontalAlignment.Left}
 				/>
 				<Padding Size={20} />
 
-				<frame Size={UDim2.fromScale(1, 0.1)} BackgroundTransparency={1}>
-					<Notifications {...props} />
+				<frame Size={UDim2.fromScale(1.3, 0.3)} BackgroundTransparency={1}>
+					<Chat {...props} />
 				</frame>
+
+				<canvasgroup Size={UDim2.fromScale(1, 0.55)} BackgroundTransparency={1}>
+					<uigradient
+						Transparency={
+							new NumberSequence([
+								new NumberSequenceKeypoint(0, 1),
+								new NumberSequenceKeypoint(0.1, 0),
+								new NumberSequenceKeypoint(1, 0),
+							])
+						}
+						Rotation={90}
+					/>
+					<frame
+						Size={UDim2.fromScale(1, 0.2)}
+						AnchorPoint={new Vector2(0, 1)}
+						Position={UDim2.fromScale(0, 1)}
+						BackgroundTransparency={1}
+					>
+						<Notifications {...props} />
+					</frame>
+				</canvasgroup>
 
 				<frame Size={UDim2.fromScale(1, 0.05)} BackgroundTransparency={1}>
 					<Center />

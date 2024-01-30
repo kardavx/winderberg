@@ -1,5 +1,6 @@
 import { Mocha } from "@rbxts/catppuccin";
 import Roact from "@rbxts/roact";
+import Stroke from "shared/ui/components/base/Stroke";
 import useSpring from "shared/ui/hook/useSpring";
 
 interface Props {
@@ -16,7 +17,7 @@ export default (props: Props) => {
 
 	return (
 		<frame Size={props.Size} BorderSizePixel={0} BackgroundColor3={Mocha.Base}>
-			<uistroke Thickness={2} Color={Mocha.Text} />
+			<Stroke Thickness={2} Color={Mocha.Text} />
 			<frame
 				BackgroundColor3={props.BackgroundColor3}
 				BorderSizePixel={0}

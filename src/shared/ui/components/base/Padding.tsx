@@ -1,4 +1,5 @@
 import Roact from "@rbxts/roact";
+import getViewportScaledUdim from "shared/ui/util/getViewportScaledUdim";
 
 interface Props {
 	Size: number;
@@ -7,10 +8,10 @@ interface Props {
 export default (props: Props) => {
 	return (
 		<uipadding
-			PaddingTop={new UDim(0, props.Size)}
-			PaddingBottom={new UDim(0, props.Size)}
-			PaddingLeft={new UDim(0, props.Size)}
-			PaddingRight={new UDim(0, props.Size)}
+			PaddingTop={getViewportScaledUdim(props.Size)}
+			PaddingBottom={getViewportScaledUdim(props.Size)}
+			PaddingLeft={getViewportScaledUdim(props.Size)}
+			PaddingRight={getViewportScaledUdim(props.Size)}
 		/>
 	);
 };

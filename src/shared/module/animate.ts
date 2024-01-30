@@ -28,7 +28,7 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 	maid.GiveTask(
 		clientSignals.onRender.Connect((deltaTime: number) => {
 			const DirectionOfMovement = character.HumanoidRootPart.CFrame.VectorToObjectSpace(
-				character.HumanoidRootPart.AssemblyLinearVelocity,
+				character.HumanoidRootPart.AssemblyLinearVelocity.mul(new Vector3(1, 0, 1)),
 			);
 
 			const Forward = math.abs(math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, -0.8, -0.01));
