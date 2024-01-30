@@ -144,10 +144,6 @@ const serverData: InitializerFunction = () => {
 			state.producer.applyMiddleware(replicateMiddleware);
 			serverState = state;
 			serverDataLoadedEvent.Fire(serverState);
-
-			state.document.beforeClose(() => {
-				serverState = undefined;
-			});
 		})
 		.catch((err: string) => {
 			warn(`FATAL DATA ERROR! Server state has failed to load, kicking players!\n`, err);

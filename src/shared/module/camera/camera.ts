@@ -1,5 +1,5 @@
 import Maid from "@rbxts/maid";
-import { CollectionService, ContextActionService, UserInputService, Workspace } from "@rbxts/services";
+import { CollectionService, ContextActionService, RunService, UserInputService, Workspace } from "@rbxts/services";
 import cameraModifier from "shared/class/cameraModifier";
 import cameraConfig from "shared/config/cameraConfig";
 import gameSignals from "shared/signal/clientSignals";
@@ -10,6 +10,7 @@ import { clientProducer } from "../clientPlayerData";
 import ignoredRaycastTags from "shared/data/ignoredRaycastTags";
 import roundVector from "shared/util/roundVector";
 import unnanifyVector from "shared/util/unnanifyVector";
+import OnKeyHeld from "shared/util/OnKeyHeld";
 
 let moveDirection = Vector3.zero;
 
@@ -83,6 +84,23 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 	let currentZOffset = zOffset;
 
 	const desiredOffset = new CFrame(1, 1, 0);
+	let locked = false;
+
+	maid.GiveTask(
+		OnKeyClicked(
+			"aim",
+			() => {
+				if (locked) {
+					locked = false;
+					clientProducer.removeLockEnabler("aim");
+				} else {
+					locked = true;
+					clientProducer.addLockEnabler("aim");
+				}
+			},
+			Enum.UserInputType.MouseButton2,
+		),
+	);
 
 	maid.GiveTask(
 		gameSignals.onRender.Connect((deltaTime: number) => {
@@ -107,6 +125,7 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 			);
 
 			if (isCameraLocked) {
+				character.Humanoid.AutoRotate = false;
 				moveDirection = roundVector(
 					unnanifyVector(
 						new CFrame(cameraSubject)
@@ -115,6 +134,7 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 					),
 				);
 			} else {
+				character.Humanoid.AutoRotate = true;
 				moveDirection = new Vector3(0, 0, -math.sign(character.Humanoid.MoveDirection.Magnitude));
 			}
 
@@ -131,14 +151,22 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 			const ZoffsetedCFrame = cframeWithModifiers.mul(new CFrame(0, 0, currentZOffset));
 
 			CurrentCamera.CFrame = ZoffsetedCFrame;
-			CurrentCamera.Focus = baseCFrame;
-
-			if (isCameraLocked) {
-				const [x, y, z] = baseCFrame.ToOrientation();
-				character.PrimaryPart.CFrame = new CFrame(character.PrimaryPart.Position).mul(CFrame.Angles(0, y, 0));
-			}
+			CurrentCamera.Focus = ZoffsetedCFrame;
 		}),
 	);
+
+	RunService.BindToRenderStep("UpdateAfterCharacter", Enum.RenderPriority.Character.Value + 1, () => {
+		const currentState = clientProducer.getState();
+		const isCameraLocked = currentState.lockEnablers.size() > 0;
+
+		if (isCameraLocked) {
+			character.PrimaryPart.CFrame = new CFrame(character.PrimaryPart.Position).mul(
+				CFrame.Angles(0, math.rad(orientation.X), 0),
+			);
+		}
+	});
+
+	maid.GiveTask(() => RunService.UnbindFromRenderStep("UpdateAfterCharacter"));
 
 	maid.GiveTask(
 		OnKeyClicked(

@@ -16,12 +16,15 @@ export default <T extends AnimationList>(
 
 		const animationTrack = adornee.LoadAnimation(animation);
 		maid.GiveTask(animationTrack);
-
-		if (callback) callback(animationTrack, animationName as keyof T);
-
 		animations[animationName as keyof T] = animationTrack;
 
 		animation.Destroy();
+	}
+
+	if (callback) {
+		for (const [animationName, animationTrack] of pairs(animations)) {
+			task.spawn(() => callback(animationTrack as AnimationTrack, animationName as keyof T));
+		}
 	}
 
 	return $tuple(animations, () => {});

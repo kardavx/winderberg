@@ -1,7 +1,6 @@
 import Maid from "@rbxts/maid";
 import clientSignals from "shared/signal/clientSignals";
 import loadAnimations from "shared/util/loadAnimations";
-import { getMoveDirection } from "./camera/camera";
 
 const movementAnimations = {
 	Idle: 16162737790,
@@ -12,14 +11,7 @@ const movementAnimations = {
 };
 
 const fadeTime = 0.2;
-const disabledWeightValue = 0.00001;
-
-const adjustParamsAndPlay = (animationTrack: AnimationTrack, weight: number = 1, speed: number = 1) => {
-	if (!animationTrack.IsPlaying) animationTrack.Play(0, disabledWeightValue, speed);
-
-	animationTrack.AdjustWeight(weight, fadeTime);
-	animationTrack.AdjustSpeed(speed);
-};
+const disabledWeightValue = 0.001;
 
 const animate: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
@@ -28,60 +20,56 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 		movementAnimations,
 		character.Humanoid.Animator,
 		(animationTrack) => {
-			animationTrack.Play(0, 1, 1);
+			animationTrack.Play(0, disabledWeightValue, 0);
 		},
 	);
 
 	maid.GiveTask(animationCleanup);
 	maid.GiveTask(
 		clientSignals.onRender.Connect((deltaTime: number) => {
-			const moveDirection = getMoveDirection();
+			const DirectionOfMovement = character.HumanoidRootPart.CFrame.VectorToObjectSpace(
+				character.HumanoidRootPart.AssemblyLinearVelocity,
+			);
 
-			const forward = moveDirection.Z;
-			const side = moveDirection.X;
-
-			const isSideways = math.abs(side) > 0;
-			const isForward = math.abs(forward) > 0;
+			const Forward = math.abs(math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, -0.8, -0.01));
+			const Backwards = math.abs(math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, 0.01, 0.8));
+			const Right = math.abs(math.clamp(DirectionOfMovement.X / character.Humanoid.WalkSpeed, 0.01, 1));
+			const Left = math.abs(math.clamp(DirectionOfMovement.X / character.Humanoid.WalkSpeed, -1, -0.01));
 
 			const speed =
 				math.max(character.PrimaryPart.AssemblyLinearVelocity.Magnitude, character.Humanoid.WalkSpeed) / 12;
 			const state = character.Humanoid.GetState();
 
-			if (
-				character.PrimaryPart.AssemblyLinearVelocity.Magnitude > 1 &&
-				state === Enum.HumanoidStateType.Running
-			) {
-				adjustParamsAndPlay(animations.Idle, disabledWeightValue, 1);
+			if (state === Enum.HumanoidStateType.Running) {
+				if (DirectionOfMovement.Z / character.Humanoid.WalkSpeed < 0.1) {
+					animations.WalkForward.AdjustWeight(Forward, fadeTime);
+					animations.WalkRight.AdjustWeight(Right, fadeTime);
+					animations.WalkLeft.AdjustWeight(Left, fadeTime);
 
-				if (forward < 0) {
-					adjustParamsAndPlay(animations.WalkForward, isSideways ? 0.5 : 0.8, speed);
-				} else {
-					adjustParamsAndPlay(animations.WalkForward, disabledWeightValue, speed);
-				}
+					animations.WalkForward.AdjustSpeed(speed);
+					animations.WalkRight.AdjustSpeed(speed);
+					animations.WalkLeft.AdjustSpeed(speed);
 
-				if (forward > 0) {
-					adjustParamsAndPlay(animations.WalkBackward, isSideways ? 0.5 : 0.8, speed * -1);
+					animations.Idle.AdjustWeight(disabledWeightValue, fadeTime);
 				} else {
-					adjustParamsAndPlay(animations.WalkBackward, disabledWeightValue, speed);
-				}
+					animations.WalkForward.AdjustWeight(Backwards, fadeTime);
+					animations.WalkRight.AdjustWeight(Left, fadeTime);
+					animations.WalkLeft.AdjustWeight(Right, fadeTime);
 
-				if ((forward <= 0 && side > 0) || (forward > 0 && side < 0)) {
-					adjustParamsAndPlay(animations.WalkRight, isForward ? 0.5 : 1, speed);
-				} else {
-					adjustParamsAndPlay(animations.WalkRight, disabledWeightValue, speed);
-				}
+					animations.WalkForward.AdjustSpeed(speed * -1);
+					animations.WalkRight.AdjustSpeed(speed * -1);
+					animations.WalkLeft.AdjustSpeed(speed * -1);
 
-				if ((forward <= 0 && side < 0) || (forward > 0 && side > 0)) {
-					adjustParamsAndPlay(animations.WalkLeft, isForward ? 0.5 : 1, speed);
-				} else {
-					adjustParamsAndPlay(animations.WalkLeft, disabledWeightValue, speed);
+					animations.Idle.AdjustWeight(disabledWeightValue, fadeTime);
 				}
 			} else {
-				adjustParamsAndPlay(animations.Idle, 1, 1);
-				adjustParamsAndPlay(animations.WalkForward, disabledWeightValue, speed);
-				adjustParamsAndPlay(animations.WalkBackward, disabledWeightValue, speed);
-				adjustParamsAndPlay(animations.WalkRight, disabledWeightValue, speed);
-				adjustParamsAndPlay(animations.WalkLeft, disabledWeightValue, speed);
+				animations.WalkForward.AdjustWeight(disabledWeightValue, fadeTime);
+				animations.WalkRight.AdjustWeight(disabledWeightValue, fadeTime);
+				animations.WalkLeft.AdjustWeight(disabledWeightValue, fadeTime);
+			}
+
+			if (DirectionOfMovement.Magnitude < 0.1) {
+				animations.Idle.AdjustWeight(1, fadeTime);
 			}
 		}),
 	);
