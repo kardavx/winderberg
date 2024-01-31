@@ -6,6 +6,9 @@ export interface State {
 
 	hunger: number;
 	thirst: number;
+
+	name?: string;
+	surname?: string;
 }
 
 export interface Actions {
@@ -24,6 +27,9 @@ export const defaultState: State = {
 
 	hunger: 100,
 	thirst: 100,
+
+	name: "Sebastian",
+	surname: "Alvarez",
 };
 
 export const saveExceptions: (keyof State)[] = [];

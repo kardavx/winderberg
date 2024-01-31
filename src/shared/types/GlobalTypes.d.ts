@@ -1,6 +1,22 @@
 type InitializerFunction = () => () => void;
 type CharacterInitializerFunction = (character: Character) => () => void;
 
+type Commands = ["say", "k", "s", "me", "do", "try"];
+
+type CommandsUnion = Commands[number];
+
+interface CommandServerData {
+	minRank?: number;
+	darkens?: boolean;
+	color?: Color3;
+	range?: number;
+	functionality: (
+		sender: Player,
+		validate: (sender: Player, message: string) => boolean,
+		message: string[],
+	) => string | undefined;
+}
+
 type withCallSignature = {
 	[key in string]: (...args: unknown[]) => void;
 };

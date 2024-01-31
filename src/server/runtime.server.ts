@@ -3,6 +3,7 @@ import serverData from "./module/serverData";
 import { Players } from "@rbxts/services";
 import serverSignals from "shared/signal/serverSignals";
 import { playerInteractionBinder } from "./module/playerInteractionBinder";
+import chatApi from "./module/chatApi";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -13,6 +14,7 @@ game.BindToClose(() => {
 
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 maid.GiveTask(serverData());
+maid.GiveTask(chatApi());
 maid.GiveTask(playerInteractionBinder());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 

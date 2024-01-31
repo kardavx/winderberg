@@ -31,10 +31,18 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 				character.HumanoidRootPart.AssemblyLinearVelocity.mul(new Vector3(1, 0, 1)),
 			);
 
-			const Forward = math.abs(math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, -0.8, -0.01));
-			const Backwards = math.abs(math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, 0.01, 0.8));
-			const Right = math.abs(math.clamp(DirectionOfMovement.X / character.Humanoid.WalkSpeed, 0.01, 1));
-			const Left = math.abs(math.clamp(DirectionOfMovement.X / character.Humanoid.WalkSpeed, -1, -0.01));
+			const Forward = math.abs(
+				math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, -0.8, -disabledWeightValue),
+			);
+			const Backwards = math.abs(
+				math.clamp(DirectionOfMovement.Z / character.Humanoid.WalkSpeed, disabledWeightValue, 0.8),
+			);
+			const Right = math.abs(
+				math.clamp(DirectionOfMovement.X / character.Humanoid.WalkSpeed, disabledWeightValue, 1),
+			);
+			const Left = math.abs(
+				math.clamp(DirectionOfMovement.X / character.Humanoid.WalkSpeed, -1, -disabledWeightValue),
+			);
 
 			const speed =
 				math.max(character.PrimaryPart.AssemblyLinearVelocity.Magnitude, character.Humanoid.WalkSpeed) / 12;

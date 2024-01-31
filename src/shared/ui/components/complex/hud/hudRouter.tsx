@@ -21,7 +21,7 @@ export default (props: CommonProps) => {
 				/>
 				<Padding Size={20} />
 
-				<frame Size={UDim2.fromScale(1.3, 0.3)} BackgroundTransparency={1}>
+				<frame Size={UDim2.fromScale(1.5, 0.3)} BackgroundTransparency={1}>
 					<Chat {...props} />
 				</frame>
 

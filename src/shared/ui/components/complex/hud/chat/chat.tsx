@@ -1,6 +1,8 @@
 import { Mocha } from "@rbxts/catppuccin";
 import Maid from "@rbxts/maid";
 import Roact from "@rbxts/roact";
+import commands from "shared/data/commands";
+import network from "shared/network/network";
 import { CommonProps } from "shared/types/UITypes";
 import Padding from "shared/ui/components/base/Padding";
 import Stroke from "shared/ui/components/base/Stroke";
@@ -10,21 +12,65 @@ import useSpring from "shared/ui/hook/useSpring";
 import getViewportScaledNumber from "shared/ui/util/getViewportScaledNumber";
 import getViewportScaledUdim from "shared/ui/util/getViewportScaledUdim";
 import OnKeyClicked from "shared/util/OnKeyClicked";
+import hasPrefix from "shared/util/hasPrefix";
+
+const findFirstCommand = (command: string): string => {
+	const matched: string[] = [];
+	let shortest: string = "";
+
+	for (const [commandName, _] of pairs(commands)) {
+		const [firstMatchedCommand] = string.find((commandName as string).lower(), command.lower(), 1, true);
+		if (firstMatchedCommand !== undefined) {
+			matched.push(commandName as string);
+		}
+	}
+
+	matched.forEach((match: string) => {
+		if (shortest === "" || shortest.size() > match.size()) {
+			shortest = match;
+		}
+	});
+
+	if (shortest !== "") {
+		let paramsString = "";
+		const commandParams = commands[shortest];
+		commandParams.forEach((param: string) => {
+			paramsString = `${paramsString} (${param})`;
+		});
+
+		return `/${shortest} ${paramsString}`;
+	}
+
+	return "";
+};
 
 export default (props: CommonProps) => {
 	const [shownFactor, setShownFactor] = useSpring({ initialValue: 1, stiffness: 80, dampening: 20 });
 	const [messages, setMessages] = Roact.useState([] as string[]);
+	const [message, setMessage] = Roact.useState("");
 	const textBoxRef = Roact.useRef(undefined) as unknown as {
 		current: TextBox;
 	};
 
+	let suggestedCommand = "";
+	if (hasPrefix(message) && message.size() > 1 && message.split(" ").size() === 1) {
+		const messageWithoutPrefix = message.sub(2);
+		suggestedCommand = findFirstCommand(messageWithoutPrefix);
+	} else {
+		suggestedCommand = "";
+	}
+
 	const renderedMessages: Roact.Element[] = [];
-	messages.forEach((message: string) => {
+	messages.forEach((message: string, index: number) => {
 		renderedMessages.push(
 			<Text
-				TextColor3={Mocha.Text}
+				TextColor3={new Color3(1, 1, 1)}
 				Stroke={10}
 				Text={message}
+				Weight="Bold"
+				LayoutOrder={index}
+				TextStrokeTransparency={0}
+				TextStrokeColor3={Mocha.Base}
 				Size={UDim2.fromScale(1, 0)}
 				CustomTextScaled={true}
 				TextXAlignment={Enum.TextXAlignment.Left}
@@ -57,6 +103,12 @@ export default (props: CommonProps) => {
 			);
 		}
 
+		maid.GiveTask(
+			network.ReceiveChatMessage.connect((message: string) => {
+				setMessages([...messages, message]);
+			}),
+		);
+
 		return () => maid.DoCleaning();
 	});
 
@@ -75,12 +127,17 @@ export default (props: CommonProps) => {
 					Transparency={shownFactor.map((factor: number) => factor)}
 					Color={Mocha.Text}
 				/>
-				<uilistlayout
-					HorizontalAlignment={Enum.HorizontalAlignment.Center}
-					VerticalAlignment={Enum.VerticalAlignment.Bottom}
-				/>
+				<Padding Size={15} />
+				<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1} ClipsDescendants={true}>
+					<uilistlayout
+						Padding={getViewportScaledUdim(5)}
+						HorizontalAlignment={Enum.HorizontalAlignment.Center}
+						VerticalAlignment={Enum.VerticalAlignment.Bottom}
+						SortOrder={Enum.SortOrder.LayoutOrder}
+					/>
 
-				{renderedMessages}
+					{renderedMessages}
+				</frame>
 			</frame>
 			<canvasgroup
 				Size={UDim2.fromScale(1, 0.19525)}
@@ -97,15 +154,34 @@ export default (props: CommonProps) => {
 					Transparency={shownFactor.map((factor: number) => factor)}
 					Color={Mocha.Text}
 				/>
+				<Text
+					Size={UDim2.fromScale(1, 1)}
+					BackgroundTransparency={1}
+					CustomTextScaled={true}
+					Text={suggestedCommand}
+					Weight="Bold"
+					TextWrapped={true}
+					TextColor3={new Color3(1, 1, 1)}
+					TextTransparency={0.5}
+					AutomaticSize={Enum.AutomaticSize.Y}
+					TextSize={18}
+					TextXAlignment={Enum.TextXAlignment.Left}
+				>
+					<Padding Size={15} />
+				</Text>
 				<TextBox
 					Size={UDim2.fromScale(1, 1)}
 					BackgroundTransparency={1}
 					CustomTextScaled={true}
 					Text=""
 					Active={false}
+					Weight="Bold"
+					ZIndex={2}
 					ShowNativeInput={false}
+					TextStrokeTransparency={0}
+					TextStrokeColor3={Mocha.Base}
 					TextWrapped={true}
-					TextColor3={Mocha.Text}
+					TextColor3={new Color3(1, 1, 1)}
 					forwardedRef={textBoxRef}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					TextSize={18}
@@ -123,11 +199,12 @@ export default (props: CommonProps) => {
 								textBoxRef.current.Text = "";
 
 								if (message !== "") {
-									setMessages([...messages, message]);
+									network.SendChatMessage.fire(message);
 								}
 							}
 						}
 					}}
+					TextChanged={(message: string) => setMessage(message)}
 				>
 					<Padding Size={15} />
 				</TextBox>

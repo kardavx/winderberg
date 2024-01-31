@@ -42,7 +42,7 @@ const getActualZOffset = (
 ): number => {
 	const raycastResult = Workspace.Blockcast(
 		facing,
-		new Vector3(0.1, 0.1, 0.1),
+		new Vector3(0.4, 0.4, 0.1),
 		facing.LookVector.mul(-targetZOffset),
 		raycastParams,
 	);

@@ -4,6 +4,7 @@ import { weightToFont } from "./Text";
 
 interface Props extends Roact.JsxInstanceProperties<TextBox>, Roact.PropsWithChildren {
 	FocusChanged?: (focused: boolean, enterPressed: boolean) => void;
+	TextChanged?: (text: string) => void;
 	CustomTextScaled?: boolean;
 	forwardedRef?: Roact.Ref<TextBox>;
 	Weight?: "Regular" | "Bold";
@@ -20,6 +21,7 @@ export default (props: Props) => {
 		FocusChanged: undefined,
 		CustomTextScaled: undefined,
 		Weight: undefined,
+		TextChanged: undefined,
 		forwardedRef: undefined,
 	};
 
@@ -37,6 +39,11 @@ export default (props: Props) => {
 				},
 				FocusLost: (_, enterPressed: boolean) => {
 					if (props.FocusChanged) props.FocusChanged(false, enterPressed);
+				},
+			}}
+			Change={{
+				Text: (textBox: TextBox) => {
+					if (props.TextChanged) props.TextChanged(textBox.Text);
 				},
 			}}
 		>
