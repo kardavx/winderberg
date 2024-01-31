@@ -4,6 +4,8 @@ import { Notification, StoredNotification } from "shared/data/notificationData";
 export interface State {
 	count: number;
 	stamina: number;
+	staminaUsageMultiplier: number;
+
 	mouseEnablers: string[];
 	lockEnablers: string[];
 	notifications: StoredNotification[];
@@ -22,11 +24,15 @@ export interface Actions {
 
 	pushNotification: (notification: Notification) => void;
 	removeNotification: (index: number) => void;
+
+	setStaminaUsageMultiplier: (staminaUsageMultiplier: number) => void;
 }
 
 export const defaultState: State = {
 	count: 0,
 	stamina: 100,
+	staminaUsageMultiplier: 1,
+
 	mouseEnablers: [],
 	lockEnablers: [],
 	notifications: [],
@@ -35,7 +41,7 @@ export const defaultState: State = {
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
 		increment: (oldState: State): State => {
-			const state = table.clone(oldState);
+			const state = { ...oldState };
 			state.count++;
 
 			return state;
@@ -45,8 +51,8 @@ export const CreateProducer = (initialState: State) => {
 				return oldState;
 			}
 
-			const state = table.clone(oldState);
-			state.mouseEnablers = table.clone(state.mouseEnablers);
+			const state = { ...oldState };
+			state.mouseEnablers = [...state.mouseEnablers];
 			state.mouseEnablers.push(enablerId);
 
 			return state;
@@ -57,8 +63,8 @@ export const CreateProducer = (initialState: State) => {
 				return oldState;
 			}
 
-			const state = table.clone(oldState);
-			state.mouseEnablers = table.clone(state.mouseEnablers);
+			const state = { ...oldState };
+			state.mouseEnablers = [...state.mouseEnablers];
 			state.mouseEnablers.remove(index);
 
 			return state;
@@ -68,8 +74,8 @@ export const CreateProducer = (initialState: State) => {
 				return oldState;
 			}
 
-			const state = table.clone(oldState);
-			state.lockEnablers = table.clone(state.lockEnablers);
+			const state = { ...oldState };
+			state.lockEnablers = [...state.lockEnablers];
 			state.lockEnablers.push(enablerId);
 
 			return state;
@@ -80,8 +86,8 @@ export const CreateProducer = (initialState: State) => {
 				return oldState;
 			}
 
-			const state = table.clone(oldState);
-			state.lockEnablers = table.clone(state.lockEnablers);
+			const state = { ...oldState };
+			state.lockEnablers = [...state.lockEnablers];
 			state.lockEnablers.remove(index);
 
 			return state;
@@ -89,8 +95,8 @@ export const CreateProducer = (initialState: State) => {
 		pushNotification: (oldState: State, notification: Notification): State => {
 			print("pushing notification");
 
-			const state = table.clone(oldState);
-			state.notifications = table.clone(state.notifications);
+			const state = { ...oldState };
+			state.notifications = [...state.notifications];
 			state.notifications.push({ ...notification, ...{ pushTick: tick() } });
 
 			return state;
@@ -98,8 +104,8 @@ export const CreateProducer = (initialState: State) => {
 		removeNotification: (oldState: State, index: number): State => {
 			if (!oldState.notifications[index]) return oldState;
 
-			const state = table.clone(oldState);
-			state.notifications = table.clone(state.notifications);
+			const state = { ...oldState };
+			state.notifications = [...state.notifications];
 			state.notifications.remove(index);
 
 			return state;
@@ -113,6 +119,12 @@ export const CreateProducer = (initialState: State) => {
 		removeStamina: (oldState: State, amountToSubtract: number): State => {
 			const state = { ...oldState };
 			state.stamina = math.clamp(state.stamina - amountToSubtract, 0, 100);
+
+			return state;
+		},
+		setStaminaUsageMultiplier: (oldState: State, staminaUsageMultiplier: number): State => {
+			const state = { ...oldState };
+			state.staminaUsageMultiplier = staminaUsageMultiplier;
 
 			return state;
 		},

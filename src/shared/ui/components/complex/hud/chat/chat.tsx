@@ -33,7 +33,7 @@ const findFirstCommand = (command: string): string => {
 
 	if (shortest !== "") {
 		let paramsString = "";
-		const commandParams = commands[shortest];
+		const commandParams = commands[shortest as CommandsUnion];
 		commandParams.forEach((param: string) => {
 			paramsString = `${paramsString} (${param})`;
 		});
@@ -105,7 +105,10 @@ export default (props: CommonProps) => {
 
 		maid.GiveTask(
 			network.ReceiveChatMessage.connect((message: string) => {
-				setMessages([...messages, message]);
+				const newMessages = [...messages, message];
+				if (newMessages.size() === 15) newMessages.remove(0);
+
+				setMessages(newMessages);
 			}),
 		);
 
@@ -199,6 +202,10 @@ export default (props: CommonProps) => {
 								textBoxRef.current.Text = "";
 
 								if (message !== "") {
+									if (message.lower() === "/clear") {
+										setMessages([]);
+										return;
+									}
 									network.SendChatMessage.fire(message);
 								}
 							}

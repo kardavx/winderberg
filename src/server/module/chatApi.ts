@@ -43,8 +43,13 @@ const getColor = (
 };
 
 const validateMessage = (sender: Player, message: string): boolean => {
-	if (wasMessageFiltered(message, sender.UserId)) {
-		network.ReceiveChatMessage.fire(sender, attachRichTextColor(errors.wasFiltered(), errors.errorColor));
+	const [filtered, filteredMessage] = wasMessageFiltered(message, sender.UserId);
+
+	if (filtered) {
+		network.ReceiveChatMessage.fire(
+			sender,
+			attachRichTextColor(errors.wasFiltered(filteredMessage as string), errors.errorColor),
+		);
 		return false;
 	}
 

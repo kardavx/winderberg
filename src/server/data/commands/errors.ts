@@ -5,5 +5,5 @@ export default {
 
 	notFound: (commandName: string) => `Komenda /${commandName} nie istnieje!`,
 	notPermitted: (commandName: string) => `Nie masz dostępu do komendy /${commandName}`,
-	wasFiltered: () => `Twoja wiadomość została odrzucona przez filtr!`,
+	wasFiltered: (result: string) => `Twoja wiadomość została odrzucona przez filtr! Rezultat: ${result}`,
 };

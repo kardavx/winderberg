@@ -1,5 +1,5 @@
 export default {
-	Far: 30,
-	Normal: 15,
-	Close: 6,
+	Far: 60,
+	Normal: 35,
+	Close: 15,
 };

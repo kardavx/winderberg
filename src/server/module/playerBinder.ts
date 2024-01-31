@@ -1,7 +1,7 @@
 import Maid from "@rbxts/maid";
 import serverSignals from "shared/signal/serverSignals";
 
-export const playerInteractionBinder: InitializerFunction = () => {
+const playerBinder: InitializerFunction = () => {
 	const maid = new Maid();
 
 	maid.GiveTask(
@@ -15,3 +15,5 @@ export const playerInteractionBinder: InitializerFunction = () => {
 		maid.DoCleaning();
 	};
 };
+
+export default playerBinder;
