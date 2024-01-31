@@ -1,5 +1,5 @@
-type Marks = [".", "!"];
-const marks: Marks = [".", "!"];
+type Marks = [".", "!", "?"];
+const marks: Marks = [".", "!", "?"];
 
 export default (message: string, mark: Marks[number]): string => {
 	const lastCharacter = message.sub(-1, -1);
