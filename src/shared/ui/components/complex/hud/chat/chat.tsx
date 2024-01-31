@@ -115,7 +115,7 @@ export default (props: CommonProps) => {
 						return;
 					}
 
-					const newHistoryIndex = math.min(historyIndex + 1, messageHistory.size());
+					const newHistoryIndex = math.min(historyIndex + 1, messageHistory.size() - 1);
 					setHistoryIndex(newHistoryIndex);
 					textBoxRef.current.Text = messageHistory[newHistoryIndex];
 				}, Enum.KeyCode.Up),
@@ -239,7 +239,7 @@ export default (props: CommonProps) => {
 									}
 
 									const newHistory = [...messageHistory];
-									newHistory.push(message);
+									newHistory.insert(0, message);
 									if (newHistory.size() > 10) newHistory.pop();
 
 									setMessageHistory(newHistory);
