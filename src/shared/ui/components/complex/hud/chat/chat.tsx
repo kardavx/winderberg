@@ -12,6 +12,7 @@ import useSpring from "shared/ui/hook/useSpring";
 import getViewportScaledNumber from "shared/ui/util/getViewportScaledNumber";
 import getViewportScaledUdim from "shared/ui/util/getViewportScaledUdim";
 import OnKeyClicked from "shared/util/OnKeyClicked";
+import OnUISKeyClicked from "shared/util/OnUISKeyClicked";
 import hasPrefix from "shared/util/hasPrefix";
 
 const findFirstCommand = (command: string): string => {
@@ -48,6 +49,8 @@ export default (props: CommonProps) => {
 	const [shownFactor, setShownFactor] = useSpring({ initialValue: 1, stiffness: 80, dampening: 20 });
 	const [messages, setMessages] = Roact.useState([] as string[]);
 	const [message, setMessage] = Roact.useState("");
+	const [messageHistory, setMessageHistory] = Roact.useState([] as string[]);
+	const [historyIndex, setHistoryIndex] = Roact.useState(undefined as number | undefined);
 	const textBoxRef = Roact.useRef(undefined) as unknown as {
 		current: TextBox;
 	};
@@ -100,6 +103,33 @@ export default (props: CommonProps) => {
 					},
 					Enum.KeyCode.Slash,
 				),
+			);
+
+			maid.GiveTask(
+				OnUISKeyClicked(() => {
+					if (!textBoxRef.current.IsFocused() || messageHistory.size() === 0) return;
+
+					if (historyIndex === undefined) {
+						setHistoryIndex(0);
+						textBoxRef.current.Text = messageHistory[0];
+						return;
+					}
+
+					const newHistoryIndex = math.min(historyIndex + 1, messageHistory.size());
+					setHistoryIndex(newHistoryIndex);
+					textBoxRef.current.Text = messageHistory[newHistoryIndex];
+				}, Enum.KeyCode.Up),
+			);
+
+			maid.GiveTask(
+				OnUISKeyClicked(() => {
+					if (!textBoxRef.current.IsFocused() || historyIndex === undefined || messageHistory.size() === 0)
+						return;
+
+					const newHistoryIndex = math.max(historyIndex - 1, 0);
+					setHistoryIndex(newHistoryIndex);
+					textBoxRef.current.Text = messageHistory[newHistoryIndex];
+				}, Enum.KeyCode.Down),
 			);
 		}
 
@@ -199,6 +229,7 @@ export default (props: CommonProps) => {
 								const message = textBoxRef.current.Text;
 
 								textBoxRef.current.ReleaseFocus();
+								setHistoryIndex(undefined);
 								textBoxRef.current.Text = "";
 
 								if (message !== "") {
@@ -206,6 +237,12 @@ export default (props: CommonProps) => {
 										setMessages([]);
 										return;
 									}
+
+									const newHistory = [...messageHistory];
+									newHistory.push(message);
+									if (newHistory.size() > 10) newHistory.pop();
+
+									setMessageHistory(newHistory);
 									network.SendChatMessage.fire(message);
 								}
 							}
