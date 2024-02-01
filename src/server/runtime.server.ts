@@ -1,9 +1,9 @@
 import Maid from "@rbxts/maid";
-import serverData from "./module/serverData";
+import serverData from "./controller/serverData";
 import { Players } from "@rbxts/services";
 import serverSignals from "shared/signal/serverSignals";
-import chatApi from "./module/chatApi";
-import playerBinder from "./module/playerBinder";
+import chatApi from "./controller/chatApi";
+import playerBinder from "./controller/playerBinder";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
