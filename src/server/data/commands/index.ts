@@ -1,5 +1,6 @@
 // Module for storing command functionalities
 
+import b from "./b";
 import doCommand from "./do";
 import k from "./k";
 import me from "./me";
@@ -14,6 +15,7 @@ const commands: { [commandName in CommandsUnion]: CommandServerData } = {
 	me,
 	do: doCommand,
 	try: tryCommand,
+	b,
 };
 
 export default commands;

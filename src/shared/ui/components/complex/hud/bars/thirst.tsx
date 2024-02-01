@@ -15,7 +15,7 @@ export default (props: Props) => {
 		<Bar
 			icon="rbxassetid://13492318033"
 			iconXOffset={0}
-			progress={100}
+			progress={thirst}
 			Size={UDim2.fromScale(props.Size, 1)}
 			BackgroundColor3={Mocha.Blue}
 		/>

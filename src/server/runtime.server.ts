@@ -1,9 +1,10 @@
 import Maid from "@rbxts/maid";
 import serverData from "./controller/serverData";
-import { Players } from "@rbxts/services";
+import { Players, RunService } from "@rbxts/services";
 import serverSignals from "shared/signal/serverSignals";
 import chatApi from "./controller/chatApi";
 import playerBinder from "./controller/playerBinder";
+import vitals from "./controller/vitals";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -15,6 +16,7 @@ game.BindToClose(() => {
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 maid.GiveTask(serverData());
 maid.GiveTask(chatApi());
+maid.GiveTask(vitals());
 maid.GiveTask(playerBinder());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 
@@ -62,6 +64,8 @@ maid.GiveTask(
 		serverSignals.playerAdded.Fire(player);
 	}),
 );
+
+maid.GiveTask(RunService.Heartbeat.Connect((deltaTime: number) => serverSignals.onUpdate.Fire(deltaTime)));
 
 maid.GiveTask(
 	Players.PlayerRemoving.Connect((player: Player) => {

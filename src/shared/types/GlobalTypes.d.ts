@@ -1,7 +1,7 @@
 type InitializerFunction = () => () => void;
 type CharacterInitializerFunction = (character: Character) => () => void;
 
-type Commands = ["say", "k", "s", "me", "do", "try"];
+type Commands = ["say", "k", "s", "me", "do", "try", "b"];
 
 type CommandsUnion = Commands[number];
 

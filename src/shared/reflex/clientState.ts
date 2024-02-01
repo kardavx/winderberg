@@ -2,7 +2,6 @@ import { createProducer } from "@rbxts/reflex";
 import { Notification, StoredNotification } from "shared/data/notificationData";
 
 export interface State {
-	count: number;
 	stamina: number;
 	staminaUsageMultiplier: number;
 
@@ -12,7 +11,6 @@ export interface State {
 }
 
 export interface Actions {
-	increment: () => void;
 	addMouseEnabler: (enablerId: string) => void;
 	removeMouseEnabler: (enablerId: string) => void;
 
@@ -29,7 +27,6 @@ export interface Actions {
 }
 
 export const defaultState: State = {
-	count: 0,
 	stamina: 100,
 	staminaUsageMultiplier: 1,
 
@@ -40,12 +37,6 @@ export const defaultState: State = {
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
-		increment: (oldState: State): State => {
-			const state = { ...oldState };
-			state.count++;
-
-			return state;
-		},
 		addMouseEnabler: (oldState: State, enablerId: string): State => {
 			if (oldState.mouseEnablers.find((enabler) => enabler === enablerId) !== undefined) {
 				return oldState;

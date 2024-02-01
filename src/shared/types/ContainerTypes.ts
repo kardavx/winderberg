@@ -1,14 +1,14 @@
 import { ItemState, ItemType } from "shared/data/itemTypesData";
 
-export type ContainerItem<Type extends ItemType> = {
+export type ContainerItem = {
 	name: string;
-	type: Type;
-	state: ItemState[Type];
+	type: ItemType;
+	state: ItemState[ItemType];
 };
 
 export type ContainerSchema = {
 	maxWeight: number;
-	content: ContainerItem<ItemType>[];
+	content: ContainerItem[];
 };
 
 export type ContainersSchema = ContainerSchema[];

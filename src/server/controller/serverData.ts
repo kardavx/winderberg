@@ -83,7 +83,10 @@ export const waitForServerState = (): Promise<ServerState> => {
 	});
 };
 
-const getDataToSave = <scopedState>(state: scopedState, saveExceptions: typeof profileSaveExceptions): scopedState => {
+const getDataToSave = <scopedState>(
+	state: scopedState,
+	saveExceptions: typeof profileSaveExceptions | typeof serverSaveExceptions,
+): scopedState => {
 	const newState = { ...state } as { [key: string]: unknown };
 
 	saveExceptions.forEach((exception: string) => {
@@ -129,7 +132,7 @@ const serverData: InitializerFunction = () => {
 								arguments: args,
 							});
 							state.changedBy = undefined;
-							return dispatch(args);
+							return dispatch(...args);
 						}
 
 						network.GetReplicatedState.fireAll({
@@ -137,7 +140,7 @@ const serverData: InitializerFunction = () => {
 							arguments: args,
 						});
 
-						return dispatch(args);
+						return dispatch(...args);
 					};
 			};
 
@@ -185,7 +188,7 @@ const serverData: InitializerFunction = () => {
 								(...args: unknown[]) => {
 									if (profile.nextActionIsReplicated) {
 										profile.nextActionIsReplicated = false;
-										return dispatch(args);
+										return dispatch(...args);
 									}
 
 									network.GetReplicatedProfile.fire(player, {
@@ -193,7 +196,7 @@ const serverData: InitializerFunction = () => {
 										arguments: args,
 									});
 
-									return dispatch(args);
+									return dispatch(...args);
 								};
 						};
 

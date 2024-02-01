@@ -5,7 +5,6 @@ import { ClientProducer } from "shared/reflex/clientState";
 import { ProfileProducer } from "shared/reflex/serverProfile";
 import { ServerProducer } from "shared/reflex/serverState";
 import { CommonProps } from "shared/types/UITypes";
-import Menu from "./components/complex/menu/menu";
 import Interaction from "./components/complex/interaction/interaction";
 import reactConditional from "./util/reactConditional";
 import HudRouter from "./components/complex/hud/hudRouter";

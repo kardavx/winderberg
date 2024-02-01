@@ -1,8 +1,11 @@
 import { createProducer } from "@rbxts/reflex";
 
+const names: string[] = ["Jason", "Nathan", "Rick"];
+const surnames: string[] = ["Smith", "White", "Grime", "Madador"];
+
 export interface State {
-	count: number;
-	test: string;
+	money: number;
+	bank: number;
 
 	hunger: number;
 	thirst: number;
@@ -12,55 +15,55 @@ export interface State {
 }
 
 export interface Actions {
-	increment: () => void;
+	secureAddHunger: (amountToAdd: number) => void;
+	secureRemoveHunger: (amountToSubtract: number) => void;
 
-	addHunger: (amountToAdd: number) => void;
-	removeHunger: (amountToSubtract: number) => void;
-
-	addThirst: (amountToAdd: number) => void;
-	removeThirst: (amountToSubtract: number) => void;
+	secureAddThirst: (amountToAdd: number) => void;
+	secureRemoveThirst: (amountToSubtract: number) => void;
 }
 
 export const defaultState: State = {
-	count: 0,
-	test: "test rekoncylacji, dziala??",
+	money: 1337,
+	bank: 1000,
 
 	hunger: 100,
 	thirst: 100,
 
-	name: "Sebastian",
-	surname: "Alvarez",
+	name: names[math.random(0, names.size() - 1)],
+	surname: surnames[math.random(0, names.size() - 1)],
 };
 
-export const saveExceptions: (keyof State)[] = [];
+export const saveExceptions: Partial<keyof State>[] = [];
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
-		increment: (oldState: State): State => {
-			const state = table.clone(oldState);
-			state.count++;
+		secureAddHunger: (oldState: State, amountToAdd: number): State => {
+			if (oldState.hunger === 100) return oldState;
 
-			return state;
-		},
-		addHunger: (oldState: State, amountToAdd: number): State => {
 			const state = { ...oldState };
 			state.hunger = math.clamp(state.hunger + amountToAdd, 0, 100);
 
 			return state;
 		},
-		removeHunger: (oldState: State, amountToSubtract: number): State => {
+		secureRemoveHunger: (oldState: State, amountToSubtract: number): State => {
+			if (oldState.hunger === 0) return oldState;
+
 			const state = { ...oldState };
 			state.hunger = math.clamp(state.hunger - amountToSubtract, 0, 100);
 
 			return state;
 		},
-		addThirst: (oldState: State, amountToAdd: number): State => {
+		secureAddThirst: (oldState: State, amountToAdd: number): State => {
+			if (oldState.thirst === 100) return oldState;
+
 			const state = { ...oldState };
 			state.thirst = math.clamp(state.thirst + amountToAdd, 0, 100);
 
 			return state;
 		},
-		removeThirst: (oldState: State, amountToSubtract: number): State => {
+		secureRemoveThirst: (oldState: State, amountToSubtract: number): State => {
+			if (oldState.thirst === 0) return oldState;
+
 			const state = { ...oldState };
 			state.thirst = math.clamp(state.thirst - amountToSubtract, 0, 100);
 

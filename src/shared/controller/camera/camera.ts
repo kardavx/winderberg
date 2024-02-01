@@ -10,7 +10,6 @@ import { clientProducer } from "../clientPlayerData";
 import ignoredRaycastTags from "shared/data/ignoredRaycastTags";
 import roundVector from "shared/util/roundVector";
 import unnanifyVector from "shared/util/unnanifyVector";
-import OnKeyHeld from "shared/util/OnKeyHeld";
 
 let moveDirection = Vector3.zero;
 
@@ -104,10 +103,22 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 
 	maid.GiveTask(
 		gameSignals.onRender.Connect((deltaTime: number) => {
+			const ignored: Instance[] = [];
+			ignoredRaycastTags.forEach((tag: string) => {
+				CollectionService.GetTagged(tag).forEach((tagged) => {
+					ignored.push(tagged);
+				});
+			});
+
+			cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera, ...ignored];
+
 			const currentState = clientProducer.getState();
 
 			const isMouseUnlocked = currentState.mouseEnablers.size() > 0;
-			const isCameraLocked = currentState.lockEnablers.size() > 0;
+			const isCameraLocked =
+				character.Humanoid.GetState() !== Enum.HumanoidStateType.Seated &&
+				character.Humanoid.GetState() !== Enum.HumanoidStateType.Climbing &&
+				currentState.lockEnablers.size() > 0;
 
 			UserInputService.MouseIconEnabled = isMouseUnlocked;
 
@@ -157,7 +168,10 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 
 	RunService.BindToRenderStep("UpdateAfterCharacter", Enum.RenderPriority.Character.Value + 1, () => {
 		const currentState = clientProducer.getState();
-		const isCameraLocked = currentState.lockEnablers.size() > 0;
+		const isCameraLocked =
+			character.Humanoid.GetState() !== Enum.HumanoidStateType.Seated &&
+			character.Humanoid.GetState() !== Enum.HumanoidStateType.Climbing &&
+			currentState.lockEnablers.size() > 0;
 
 		if (isCameraLocked) {
 			character.PrimaryPart.CFrame = new CFrame(character.PrimaryPart.Position).mul(

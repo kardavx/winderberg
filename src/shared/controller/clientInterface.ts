@@ -20,6 +20,7 @@ const clientInterface: InitializerFunction = () => {
 	const container = new Instance("ScreenGui");
 	container.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
 	container.Name = "Client";
+	container.ResetOnSpawn = false;
 	container.Parent = LocalPlayer.PlayerGui;
 
 	const root = ReactRoblox.createRoot(container);

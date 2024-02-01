@@ -12,6 +12,9 @@ const animationList = {
 	Fall: 16189391286,
 	Climb: 16189425645,
 	Landed: 16189401060,
+	Seat: 16194757925,
+	DriverSeat: 16194759720,
+	PassengerSeat: 16194761482,
 };
 
 const fadeTime = 0.2;
@@ -44,6 +47,21 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 						1,
 						math.clamp(character.PrimaryPart.AssemblyLinearVelocity.Magnitude, 0, 1),
 					);
+				if (newState === Enum.HumanoidStateType.Seated) {
+					const seatPart = character.Humanoid.SeatPart as Seat;
+					if (seatPart.GetAttribute("carSeatType") === "Driver") {
+						animations.DriverSeat.Play(fadeTime);
+					} else if (seatPart.GetAttribute("carSeatType") === "Passenger") {
+						animations.PassengerSeat.Play(fadeTime);
+					} else {
+						animations.Seat.Play(fadeTime);
+					}
+				}
+				if (oldState === Enum.HumanoidStateType.Seated) {
+					animations.Seat.Stop(fadeTime);
+					animations.DriverSeat.Stop(fadeTime);
+					animations.PassengerSeat.Stop(fadeTime);
+				}
 			},
 		),
 	);

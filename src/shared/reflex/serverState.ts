@@ -1,5 +1,4 @@
 import { createProducer } from "@rbxts/reflex";
-import { ItemType } from "shared/data/itemTypesData";
 import { ContainerItem, ContainersSchema } from "shared/types/ContainerTypes";
 
 export interface State {
@@ -9,7 +8,7 @@ export interface State {
 
 export interface Actions {
 	secureCreateContainer: (maxWeight: number) => void;
-	secureAddItemToContainer: (containerId: number, item: ContainerItem<ItemType>) => void;
+	secureAddItemToContainer: (containerId: number, item: ContainerItem) => void;
 	secureRemoveItemFromContainer: (containerId: number, index: number) => void;
 	secureSetServerStartTick: (tick: number) => void;
 }
@@ -19,7 +18,7 @@ export const defaultState: State = {
 	containers: [],
 };
 
-export const saveExceptions: (keyof State)[] = ["serverStartTick"];
+export const saveExceptions: Partial<keyof State>[] = ["serverStartTick"];
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
@@ -39,7 +38,7 @@ export const CreateProducer = (initialState: State) => {
 
 			return state;
 		},
-		secureAddItemToContainer: (oldState: State, containerId: number, item: ContainerItem<ItemType>): State => {
+		secureAddItemToContainer: (oldState: State, containerId: number, item: ContainerItem): State => {
 			if (oldState.containers[containerId] === undefined) return oldState;
 
 			const state = { ...oldState };

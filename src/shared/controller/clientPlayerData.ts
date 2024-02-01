@@ -39,7 +39,7 @@ const replicateProfileMiddleware = () => {
 		(...args: unknown[]) => {
 			if (nextProfileActionIsReplicated) {
 				nextProfileActionIsReplicated = false;
-				return dispatch(args);
+				return dispatch(...args);
 			}
 
 			print("replicating profile");
@@ -49,7 +49,7 @@ const replicateProfileMiddleware = () => {
 				arguments: args,
 			});
 
-			return dispatch(args);
+			return dispatch(...args);
 		};
 };
 
@@ -58,7 +58,7 @@ const replicateStateMiddleware = () => {
 		(...args: unknown[]) => {
 			if (nextStateActionIsReplicated) {
 				nextStateActionIsReplicated = false;
-				return dispatch(args);
+				return dispatch(...args);
 			}
 
 			print("replicating state");
@@ -68,7 +68,7 @@ const replicateStateMiddleware = () => {
 				arguments: args,
 			});
 
-			return dispatch(args);
+			return dispatch(...args);
 		};
 };
 

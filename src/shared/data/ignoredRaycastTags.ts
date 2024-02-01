@@ -1,1 +1,1 @@
-export default ["interactionMock"];
+export default ["interactionMock", "Car"];

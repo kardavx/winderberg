@@ -3,7 +3,6 @@ import DebugButton from "./debugButton";
 import Padding from "../components/base/Padding";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import { CommonProps } from "shared/types/UITypes";
-import useProducerAsState from "../util/useProducerAsState";
 
 export default (props: CommonProps) => {
 	const [isShown, setIsShown] = Roact.useState(false);
@@ -13,22 +12,6 @@ export default (props: CommonProps) => {
 	} else {
 		props.clientState.removeMouseEnabler("debug");
 	}
-
-	const [clientCount] = useProducerAsState(props.clientState, (state) => {
-		return state.count;
-	});
-
-	const [profileCount] = useProducerAsState(props.serverProfile, (state) => {
-		return state.count;
-	});
-
-	const [profileTest] = useProducerAsState(props.serverProfile, (state) => {
-		return state.test;
-	});
-
-	const [serverCount] = useProducerAsState(props.serverState, (state) => {
-		return state.count;
-	});
 
 	Roact.useEffect(() => {
 		const cleanup = OnKeyClicked("handleDebugMenu", () => setIsShown(!isShown), Enum.KeyCode.F2);
@@ -50,24 +33,6 @@ export default (props: CommonProps) => {
 			<uilistlayout Padding={new UDim(0, 10)} />
 			<Padding Size={10} />
 
-			<DebugButton
-				Text={tostring(clientCount)}
-				Callback={() => {
-					props.clientState.increment();
-				}}
-			/>
-			<DebugButton
-				Text={`${profileTest}_${tostring(profileCount)}`}
-				Callback={() => {
-					props.serverProfile.increment();
-				}}
-			/>
-			<DebugButton
-				Text={tostring(serverCount)}
-				Callback={() => {
-					props.serverState.increment();
-				}}
-			/>
 			<DebugButton
 				Text={"Push test notification"}
 				Callback={() => {
@@ -101,8 +66,7 @@ export default (props: CommonProps) => {
 				Callback={() => {
 					props.clientState.pushNotification({
 						title: "DEBUG",
-						description:
-							"Essa",
+						description: "Essa",
 						icon: "crime",
 						callback: () => {
 							print("i was clicked!");

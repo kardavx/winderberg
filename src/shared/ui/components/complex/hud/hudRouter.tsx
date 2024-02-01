@@ -9,8 +9,13 @@ import Stamina from "./bars/stamina";
 import Hunger from "./bars/hunger";
 import Thirst from "./bars/thirst";
 import Chat from "./chat/chat";
+import useProducerAsState from "shared/ui/util/useProducerAsState";
 
 export default (props: CommonProps) => {
+	const [money] = useProducerAsState(props.serverProfile, (state) => state.money);
+	const [name] = useProducerAsState(props.serverProfile, (state) => state.name);
+	const [surname] = useProducerAsState(props.serverProfile, (state) => state.surname);
+
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
 			<frame Size={UDim2.fromScale(0.2, 1)} BackgroundTransparency={1}>
@@ -68,8 +73,10 @@ export default (props: CommonProps) => {
 						<Text
 							Size={UDim2.fromScale(0.7, 1)}
 							TextXAlignment={Enum.TextXAlignment.Left}
+							CustomTextScaled={true}
+							AutomaticSize={Enum.AutomaticSize.X}
 							TextColor3={new Color3(1, 1, 1)}
-							Text={"100$"}
+							Text={`${money}$`}
 							TextSize={22}
 						/>
 					</frame>
@@ -94,7 +101,9 @@ export default (props: CommonProps) => {
 							Size={UDim2.fromScale(0.7, 1)}
 							TextXAlignment={Enum.TextXAlignment.Left}
 							TextColor3={new Color3(1, 1, 1)}
-							Text={"Nathan Presscot"}
+							CustomTextScaled={true}
+							AutomaticSize={Enum.AutomaticSize.X}
+							Text={`${name} ${surname}`}
 							TextSize={22}
 						/>
 					</frame>

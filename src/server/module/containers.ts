@@ -19,7 +19,7 @@ export const createContainer = (maxWeight: number): Promise<number> => {
 	});
 };
 
-export const addItemToContainer = (containerId: number, item: ContainerItem<ItemType>): Promise<void> => {
+export const addItemToContainer = (containerId: number, item: ContainerItem): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		waitForServerState().andThen((serverState) => {
 			const producerState = serverState.producer.getState();
@@ -43,7 +43,7 @@ export const addItemToContainer = (containerId: number, item: ContainerItem<Item
 	});
 };
 
-export const addItemsToContainer = (containerId: number, items: ContainerItem<ItemType>[]): Promise<void> => {
+export const addItemsToContainer = (containerId: number, items: ContainerItem[]): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		waitForServerState().andThen((serverState) => {
 			const producerState = serverState.producer.getState();

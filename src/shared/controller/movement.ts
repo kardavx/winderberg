@@ -6,16 +6,19 @@ import { lerp } from "@rbxts/pretty-react-hooks";
 import { clientProducer } from "./clientPlayerData";
 import clampedInverseLerp from "shared/util/clampedInverseLerp";
 import OnKeyClicked from "shared/util/OnKeyClicked";
+import onKeyClickedWithPriority from "shared/util/onKeyClickedWithPriority";
 
 const walkSpeed = 8;
 const runSpeed = 16;
 
 // te wartosci sa skalowane przez deltatime jeszcze jkbc
-const staminaUsage = 10;
-const staminaReplenish = 5;
+const staminaUsage = 5;
+const staminaReplenish = 7;
 
 const jumpCooldown = 2;
-const jumpStaminaUsage = 5;
+const jumpStaminaUsage = 2;
+
+const staminaReplenishCooldown = 2;
 
 const movement: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
@@ -27,6 +30,8 @@ const movement: CharacterInitializerFunction = (character: Character) => {
 
 	let nextJumpTick = tick();
 	let hasJumped = false;
+
+	let runEndedTick: number | undefined;
 
 	character.Humanoid.WalkSpeed = targetWalkspeed;
 
@@ -41,15 +46,21 @@ const movement: CharacterInitializerFunction = (character: Character) => {
 	);
 
 	maid.GiveTask(
-		OnKeyClicked(
+		onKeyClickedWithPriority(
 			"CustomJump",
 			() => {
-				if (tick() < nextJumpTick || limitReached === true || hasJumped === true) return;
+				if (
+					tick() < nextJumpTick ||
+					limitReached === true ||
+					hasJumped === true ||
+					character.Humanoid.GetState() === Enum.HumanoidStateType.Seated
+				)
+					return;
 
-				print(limitReached);
 				hasJumped = true;
 				character.Humanoid.ChangeState(Enum.HumanoidStateType.Jumping);
 			},
+			999999999,
 			Enum.KeyCode.Space,
 		),
 	);
@@ -60,12 +71,18 @@ const movement: CharacterInitializerFunction = (character: Character) => {
 				hasJumped = false;
 				nextJumpTick = tick() + jumpCooldown;
 			}
-			if (newValue === Enum.HumanoidStateType.Jumping) clientProducer.removeStamina(jumpStaminaUsage);
+			if (newValue === Enum.HumanoidStateType.Jumping) {
+				const state = clientProducer.getState();
+
+				clientProducer.removeStamina(jumpStaminaUsage * state.staminaUsageMultiplier);
+			}
 		}),
 	);
 
 	const performRun = (deltaTime: number) => {
 		const state = clientProducer.getState();
+
+		if (runEndedTick !== undefined) runEndedTick = undefined;
 
 		targetWalkspeed = runSpeed;
 		clientProducer.removeStamina(
@@ -80,8 +97,16 @@ const movement: CharacterInitializerFunction = (character: Character) => {
 	const performWalk = (deltaTime: number) => {
 		const state = clientProducer.getState();
 
+		if (runEndedTick === undefined) {
+			runEndedTick = tick();
+		}
+
 		targetWalkspeed = walkSpeed;
-		clientProducer.addStamina(staminaReplenish * deltaTime);
+
+		if (tick() - runEndedTick > staminaReplenishCooldown) {
+			clientProducer.addStamina(staminaReplenish * deltaTime);
+		}
+
 		if (state.stamina >= 75) limitReached = false;
 	};
 
@@ -90,7 +115,7 @@ const movement: CharacterInitializerFunction = (character: Character) => {
 			const canRun = getMoveDirection().Z === -1;
 			const isMoving = character.PrimaryPart.AssemblyLinearVelocity.Magnitude > 0;
 			if (isMoving) {
-				if (!limitReached) {
+				if (!limitReached && character.Humanoid.GetState() === Enum.HumanoidStateType.Running) {
 					if (canRun && runRequest) {
 						performRun(deltaTime);
 					} else {

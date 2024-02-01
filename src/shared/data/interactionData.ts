@@ -1,6 +1,7 @@
-import { clientProducer } from "shared/module/clientPlayerData";
+import { clientProducer } from "shared/controller/clientPlayerData";
 import { icons } from "./notificationData";
 import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
+import LocalPlayer from "shared/util/LocalPlayer";
 
 interface SubInteraction {
 	name: string;
@@ -11,6 +12,21 @@ interface SubInteraction {
 interface Interactions {
 	[interactionType: string]: SubInteraction[];
 }
+
+const carInteractions: SubInteraction[] = [
+	{
+		name: "Otwórz",
+		functionality: () => {
+			print("otwiraj");
+		},
+	},
+	{
+		name: "Zaklucz",
+		functionality: () => {
+			print("zakluczaj to");
+		},
+	},
+];
 
 const interactionData: Interactions = {
 	ATM: [
@@ -74,6 +90,29 @@ const interactionData: Interactions = {
 				print("pokazuje");
 			},
 		},
+	],
+	CarDoor: [
+		{
+			name: "Wsiądź",
+			functionality: (doorModel) => {
+				const model = doorModel as Model;
+				const value = model.FindFirstChild("To") as ObjectValue;
+				const seat = value.Value as Seat;
+				seat.Disabled = false;
+
+				seat.Sit((LocalPlayer.Character as Character).Humanoid);
+			},
+		},
+		...carInteractions,
+	],
+	CarTrunk: [
+		{
+			name: "Przeszukaj",
+			functionality: () => {
+				print("otwieraj bagaj!!");
+			},
+		},
+		...carInteractions,
 	],
 };
 

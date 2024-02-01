@@ -12,6 +12,7 @@ const commands: { [commandName in CommandsUnion]: string[] } & { clear: string[]
 	do: _do,
 	try: me,
 	clear: [],
+	b: say,
 };
 
 export default commands;
