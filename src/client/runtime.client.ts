@@ -1,13 +1,13 @@
 import Maid from "@rbxts/maid";
 import { RunService, StarterGui } from "@rbxts/services";
-import clientInterface from "shared/module/clientInterface";
+import clientInterface from "shared/controller/clientInterface";
 import gameSignals from "shared/signal/clientSignals";
 import LocalPlayer from "shared/util/LocalPlayer";
-import camera from "shared/module/camera/camera";
-import movement from "shared/module/movement";
-import cameraEffects from "shared/module/cameraEffects";
-import clientPlayerData from "shared/module/clientPlayerData";
-import animate from "shared/module/animate";
+import camera from "shared/controller/camera/camera";
+import movement from "shared/controller/movement";
+import cameraEffects from "shared/controller/cameraEffects";
+import clientPlayerData from "shared/controller/clientPlayerData";
+import animate from "shared/controller/animate";
 
 StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.All, false);
 

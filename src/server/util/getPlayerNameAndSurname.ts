@@ -1,4 +1,4 @@
-import { getPlayerProfile } from "server/module/serverData";
+import { getPlayerProfile } from "server/controller/serverData";
 
 export default (player: Player): string => {
 	const playerProfile = getPlayerProfile(player);
