@@ -2,6 +2,8 @@ import { createProducer } from "@rbxts/reflex";
 import { Notification, StoredNotification } from "shared/data/notificationData";
 
 export interface State {
+	inventoryOpen: boolean;
+
 	stamina: number;
 	staminaUsageMultiplier: number;
 
@@ -24,9 +26,13 @@ export interface Actions {
 	removeNotification: (index: number) => void;
 
 	setStaminaUsageMultiplier: (staminaUsageMultiplier: number) => void;
+
+	setInventoryOpen: (inventoryOpen: boolean) => void;
 }
 
 export const defaultState: State = {
+	inventoryOpen: false,
+
 	stamina: 100,
 	staminaUsageMultiplier: 1,
 
@@ -116,6 +122,12 @@ export const CreateProducer = (initialState: State) => {
 		setStaminaUsageMultiplier: (oldState: State, staminaUsageMultiplier: number): State => {
 			const state = { ...oldState };
 			state.staminaUsageMultiplier = staminaUsageMultiplier;
+
+			return state;
+		},
+		setInventoryOpen: (oldState: State, inventoryOpen: boolean): State => {
+			const state = { ...oldState };
+			state.inventoryOpen = inventoryOpen;
 
 			return state;
 		},

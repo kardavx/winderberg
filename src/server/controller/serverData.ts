@@ -3,7 +3,6 @@ import { Document, createCollection } from "@rbxts/lapis";
 import Maid from "@rbxts/maid";
 import { Players } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import { $terrify } from "rbxts-transformer-t-new";
 import dataConfig from "shared/config/dataConfig";
 import network from "shared/network/network";
 import reconcileMigration from "shared/reflex/migrations/reconcileMigration";
@@ -29,7 +28,7 @@ const profilesCollection = createCollection("playerProfiles", {
 			return reconcileMigration<profileState>(data as Partial<profileState>, defaultProfileState);
 		},
 	],
-	validate: $terrify<profileState>(),
+	validate: t.any,
 });
 
 const stateCollection = createCollection("serverStates", {
@@ -39,7 +38,7 @@ const stateCollection = createCollection("serverStates", {
 			return reconcileMigration<serverProdState>(data as Partial<serverProdState>, defaultServerState);
 		},
 	],
-	validate: $terrify<serverProdState>(),
+	validate: t.any,
 });
 
 const playerDataLoadedEvent: Signal<[Player, ServerPlayerProfile]> = new Signal();
@@ -106,7 +105,7 @@ const serverData: InitializerFunction = () => {
 	stateCollection
 		.load(dataConfig.serverStateKey)
 		.andThen((document) => {
-			const correctDocumentType = document as Document<serverProdState>;
+			const correctDocumentType = document as unknown as Document<serverProdState>;
 
 			const producer = createServerProducer(correctDocumentType.read());
 
@@ -161,7 +160,7 @@ const serverData: InitializerFunction = () => {
 			profilesCollection
 				.load(`playerProfile_${player.UserId}_${dataConfig.playerProfileKey}`, [player.UserId])
 				.andThen((document) => {
-					const correctDocumentType = document as Document<profileState>;
+					const correctDocumentType = document as unknown as Document<profileState>;
 
 					if (!player.Parent) {
 						document.close().catch(warn);

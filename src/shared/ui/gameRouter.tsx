@@ -10,6 +10,7 @@ import reactConditional from "./util/reactConditional";
 import HudRouter from "./components/complex/hud/hudRouter";
 import CurrentCamera from "shared/util/CurrentCamera";
 import clientSignals from "shared/signal/clientSignals";
+import Inventory from "./components/complex/inventory/inventory";
 
 export default (props: {
 	clientState: ClientProducer;
@@ -42,6 +43,7 @@ export default (props: {
 					<Debug {...commonProps} />
 					<Interaction {...commonProps} />
 					<HudRouter {...commonProps} />
+					<Inventory {...commonProps} />
 					{/* <Menu {...commonProps} /> */}
 				</Fragment>,
 			)}

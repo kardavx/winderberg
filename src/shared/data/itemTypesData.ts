@@ -1,41 +1,27 @@
+import { SaveableStateData } from "shared/types/ContainerTypes";
+
 export type ItemTypes = ["Primary", "Secondary", "Food", "Water"];
 export type ItemType = ItemTypes[number];
 
 type ItemStateSchema = {
-	[itemType in ItemType]: { weight: number; [key: string]: unknown };
+	[itemType in ItemType]: { weight: number; [key: string]: SaveableStateData };
 };
 
-export interface ItemState extends ItemStateSchema {
-	Primary: {
-		weight: number;
-		ammo: number;
-	};
-	Food: {
-		weight: number;
-		adds: number;
-	};
-	Water: {
-		weight: number;
-		adds: number;
-	};
-}
+export interface ItemState extends ItemStateSchema {}
 
 export const itemTypes: ItemTypes = ["Primary", "Secondary", "Food", "Water"];
 export const defaultItemState: ItemState = {
 	Primary: {
 		weight: 10,
-		ammo: 0,
 	},
 	Secondary: {
 		weight: 5,
 	},
 	Food: {
 		weight: 0.5,
-		adds: 20,
 	},
 	Water: {
 		weight: 1,
-		adds: 20,
 	},
 };
 

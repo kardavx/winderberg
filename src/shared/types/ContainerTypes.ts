@@ -1,9 +1,11 @@
-import { ItemState, ItemType } from "shared/data/itemTypesData";
+type SaveableTypes = string | number | boolean;
+type SaveableTable = { [key: string]: SaveableTypes & SaveableTypes };
+export type SaveableStateData = SaveableTypes | SaveableTable;
 
 export type ContainerItem = {
 	name: string;
-	type: ItemType;
-	state: ItemState[ItemType];
+	type: string;
+	state: { weight: number; [key: string]: SaveableStateData };
 };
 
 export type ContainerSchema = {

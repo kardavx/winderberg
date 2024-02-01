@@ -44,17 +44,22 @@ export const CreateProducer = (initialState: State) => {
 			const state = { ...oldState };
 			state.containers = [...state.containers];
 			state.containers[containerId] = { ...state.containers[containerId] };
+			state.containers[containerId].content = [...state.containers[containerId].content];
 			state.containers[containerId].content.push(item);
 
 			return state;
 		},
 		secureRemoveItemFromContainer: (oldState: State, containerId: number, index: number): State => {
-			if (oldState.containers[containerId] === undefined || oldState.containers[containerId].content[index])
+			if (
+				oldState.containers[containerId] === undefined ||
+				oldState.containers[containerId].content[index] === undefined
+			)
 				return oldState;
 
 			const state = { ...oldState };
 			state.containers = [...state.containers];
 			state.containers[containerId] = { ...state.containers[containerId] };
+			state.containers[containerId].content = [...state.containers[containerId].content];
 			state.containers[containerId].content.remove(index);
 
 			return state;

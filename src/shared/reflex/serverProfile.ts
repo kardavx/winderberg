@@ -12,6 +12,9 @@ export interface State {
 
 	name?: string;
 	surname?: string;
+
+	inventoryContainerId?: number;
+	externalContainerId?: number;
 }
 
 export interface Actions {
@@ -20,6 +23,11 @@ export interface Actions {
 
 	secureAddThirst: (amountToAdd: number) => void;
 	secureRemoveThirst: (amountToSubtract: number) => void;
+
+	secureSetInventoryContainerId: (containerId: number) => void;
+
+	secureOpenExternalContainer: (containerId: number) => void;
+	closeExternalContainer: () => void;
 }
 
 export const defaultState: State = {
@@ -33,7 +41,7 @@ export const defaultState: State = {
 	surname: surnames[math.random(0, names.size() - 1)],
 };
 
-export const saveExceptions: Partial<keyof State>[] = [];
+export const saveExceptions: Partial<keyof State>[] = ["externalContainerId"];
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
@@ -66,6 +74,24 @@ export const CreateProducer = (initialState: State) => {
 
 			const state = { ...oldState };
 			state.thirst = math.clamp(state.thirst - amountToSubtract, 0, 100);
+
+			return state;
+		},
+		secureSetInventoryContainerId: (oldState: State, inventoryContainerId: number): State => {
+			const state = { ...oldState };
+			state.inventoryContainerId = inventoryContainerId;
+
+			return state;
+		},
+		secureOpenExternalContainer: (oldState: State, inventoryContainerId: number): State => {
+			const state = { ...oldState };
+			state.externalContainerId = inventoryContainerId;
+
+			return state;
+		},
+		closeExternalContainer: (oldState: State): State => {
+			const state = { ...oldState };
+			state.externalContainerId = undefined;
 
 			return state;
 		},

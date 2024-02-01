@@ -42,8 +42,6 @@ const replicateProfileMiddleware = () => {
 				return dispatch(...args);
 			}
 
-			print("replicating profile");
-
 			network.ReplicateProfile.fire({
 				name: name,
 				arguments: args,
@@ -60,8 +58,6 @@ const replicateStateMiddleware = () => {
 				nextStateActionIsReplicated = false;
 				return dispatch(...args);
 			}
-
-			print("replicating state");
 
 			network.ReplicateState.fire({
 				name: name,
@@ -167,13 +163,12 @@ const clientPlayerData: InitializerFunction = () => {
 	maid.GiveTask(
 		network.GetReplicatedProfile.connect((data) => {
 			print("on profile repliation");
-			nextProfileActionIsReplicated = true;
-
 			if (!isPlayerDataLoaded) {
 				warn("Queued store action before player data loaded");
 				gameSignals.playerDataLoaded.Wait();
 			}
 
+			nextProfileActionIsReplicated = true;
 			const actualProfile = serverProfile as unknown as withCallSignature;
 			actualProfile[data.name](...data.arguments);
 		}),
@@ -182,12 +177,12 @@ const clientPlayerData: InitializerFunction = () => {
 	maid.GiveTask(
 		network.GetReplicatedState.connect((data) => {
 			print("on state repliation");
-			nextStateActionIsReplicated = true;
-
 			if (!isServerDataLoaded) {
 				warn("Queued store action before server data loaded");
 				gameSignals.serverDataLoaded.Wait();
 			}
+
+			nextStateActionIsReplicated = true;
 
 			const actualProfile = serverState as unknown as withCallSignature;
 			actualProfile[data.name](...data.arguments);

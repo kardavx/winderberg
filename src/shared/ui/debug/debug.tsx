@@ -27,6 +27,7 @@ export default (props: CommonProps) => {
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			Position={UDim2.fromScale(0.5, 0.5)}
 			Size={UDim2.fromScale(0.5, 0.4)}
+			ZIndex={100}
 			BackgroundColor3={new Color3(0, 0, 0)}
 			BackgroundTransparency={0.4}
 		>

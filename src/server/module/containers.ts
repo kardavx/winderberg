@@ -1,6 +1,5 @@
 import { ContainerItem } from "shared/types/ContainerTypes";
 import { waitForServerState } from "../controller/serverData";
-import { ItemType } from "shared/data/itemTypesData";
 import getItemsWeight from "shared/util/getItemsWeight";
 
 const containerNotFound = () => `NO_CONTAINER`;
@@ -11,7 +10,7 @@ export const createContainer = (maxWeight: number): Promise<number> => {
 	return new Promise((resolve) => {
 		waitForServerState().andThen((serverState) => {
 			const producerState = serverState.producer.getState();
-			const containerId = producerState.containers.size() - 1;
+			const containerId = producerState.containers.size();
 
 			serverState.producer.secureCreateContainer(maxWeight);
 			resolve(containerId);

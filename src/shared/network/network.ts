@@ -13,4 +13,7 @@ export default Remo.createRemotes({
 
 	SendChatMessage: remote<Server, [string]>(t.string).middleware(throttleMiddleware(0.1)),
 	ReceiveChatMessage: remote<Client, [string]>(t.string),
+
+	OpenTrunk: remote<Server, []>(),
+	TransferItem: remote<Server, ["External" | "Inventory", number]>(),
 });

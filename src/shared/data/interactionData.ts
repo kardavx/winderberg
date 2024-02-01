@@ -2,6 +2,7 @@ import { clientProducer } from "shared/controller/clientPlayerData";
 import { icons } from "./notificationData";
 import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
 import LocalPlayer from "shared/util/LocalPlayer";
+import network from "shared/network/network";
 
 interface SubInteraction {
 	name: string;
@@ -109,7 +110,8 @@ const interactionData: Interactions = {
 		{
 			name: "Przeszukaj",
 			functionality: () => {
-				print("otwieraj bagaj!!");
+				clientProducer.setInventoryOpen(true);
+				network.OpenTrunk.fire();
 			},
 		},
 		...carInteractions,

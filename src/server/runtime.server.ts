@@ -5,6 +5,8 @@ import serverSignals from "shared/signal/serverSignals";
 import chatApi from "./controller/chatApi";
 import playerBinder from "./controller/playerBinder";
 import vitals from "./controller/vitals";
+import trunkContainerTest from "./controller/trunkContainerTest";
+import containersApi from "./controller/containersApi";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -18,6 +20,8 @@ maid.GiveTask(serverData());
 maid.GiveTask(chatApi());
 maid.GiveTask(vitals());
 maid.GiveTask(playerBinder());
+maid.GiveTask(containersApi());
+maid.GiveTask(trunkContainerTest());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 
 maid.GiveTask(
