@@ -7,6 +7,7 @@ import playerBinder from "./controller/playerBinder";
 import vitals from "./controller/vitals";
 import trunkContainerTest from "./controller/trunkContainerTest";
 import containersApi from "./controller/containersApi";
+import tempPlayerInfo from "./controller/tempPlayerInfo";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -22,6 +23,7 @@ maid.GiveTask(vitals());
 maid.GiveTask(playerBinder());
 maid.GiveTask(containersApi());
 maid.GiveTask(trunkContainerTest());
+maid.GiveTask(tempPlayerInfo());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 
 maid.GiveTask(

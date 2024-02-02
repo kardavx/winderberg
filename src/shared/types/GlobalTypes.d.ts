@@ -33,4 +33,9 @@ interface Character extends Model {
 	};
 
 	Torso: BasePart;
+	Head: BasePart;
+}
+
+interface LocalPlayer extends Player {
+	PlayerGui: PlayerGui;
 }
