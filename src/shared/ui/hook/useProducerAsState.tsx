@@ -11,9 +11,9 @@ export default <State extends Slice, Actions, Slice>(
 	const [value, setValue] = Roact.useState(state);
 	const [lastValue, setLastValue] = Roact.useState(state);
 
-	debug.profilebegin("useProducerAsState");
-
 	Roact.useEffect(() => {
+		debug.profilebegin("useProducerAsState");
+
 		const effect_state = getSlice(producer.getState()) as Slice;
 		setValue(effect_state);
 
@@ -22,10 +22,10 @@ export default <State extends Slice, Actions, Slice>(
 			setLastValue(lastValue);
 		});
 
+		debug.profileend();
+
 		return disconnect;
 	}, dependencies);
-
-	debug.profileend();
 
 	return $tuple(value, lastValue);
 };

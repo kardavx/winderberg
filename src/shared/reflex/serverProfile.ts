@@ -18,6 +18,7 @@ export interface State {
 	externalContainerId?: number;
 
 	lastPlayerPosition?: SerializedVector3;
+	lastCharacterHealth?: number;
 }
 
 export interface Actions {
@@ -30,6 +31,7 @@ export interface Actions {
 	secureSetInventoryContainerId: (containerId: number) => void;
 
 	secureSetLastPlayerPosition: (position: Vector3 | undefined) => void;
+	secureSetLastCharacterHealth: (health?: number) => void;
 
 	secureOpenExternalContainer: (containerId: number) => void;
 	closeExternalContainer: () => void;
@@ -47,7 +49,10 @@ export const defaultState: State = {
 };
 
 export const saveExceptions: Partial<keyof State>[] = ["externalContainerId"];
-export const replicationExceptions: Partial<keyof Actions>[] = ["secureSetLastPlayerPosition"];
+export const replicationExceptions: Partial<keyof Actions>[] = [
+	"secureSetLastPlayerPosition",
+	"secureSetLastCharacterHealth",
+];
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
@@ -104,6 +109,14 @@ export const CreateProducer = (initialState: State) => {
 		secureSetLastPlayerPosition: (oldState: State, position: Vector3 | undefined) => {
 			const state = { ...oldState };
 			state.lastPlayerPosition = position === undefined ? undefined : serializeVector3(position);
+
+			return state;
+		},
+		secureSetLastCharacterHealth: (oldState: State, health: number | undefined) => {
+			const state = { ...oldState };
+			state.lastCharacterHealth = health;
+
+			print(health);
 
 			return state;
 		},

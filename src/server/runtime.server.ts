@@ -5,8 +5,10 @@ import serverSignals from "shared/signal/serverSignals";
 import chatApi from "./controller/chatApi";
 import playerBinder from "./controller/playerBinder";
 import vitals from "./controller/vitals";
-import trunkContainerTest from "./controller/trunkContainerTest";
 import containersApi from "./controller/containersApi";
+import interactionApi from "./controller/interactionApi";
+import storage from "./controller/storage";
+import fallDamageApi from "./controller/fallDamageApi";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -19,9 +21,11 @@ game.BindToClose(() => {
 maid.GiveTask(serverData());
 maid.GiveTask(chatApi());
 maid.GiveTask(vitals());
+maid.GiveTask(interactionApi());
 maid.GiveTask(playerBinder());
+maid.GiveTask(fallDamageApi());
 maid.GiveTask(containersApi());
-maid.GiveTask(trunkContainerTest());
+maid.GiveTask(storage());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 
 maid.GiveTask(

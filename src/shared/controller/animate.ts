@@ -13,6 +13,7 @@ const animationList = {
 	Climb: 16189425645,
 	Landed: 16189401060,
 	Seat: 16194757925,
+	Run: 16214766463,
 	DriverSeat: 16194759720,
 	PassengerSeat: 16194761482,
 };
@@ -116,6 +117,7 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 					animations.Idle.AdjustWeight(disabledWeightValue, fadeTime);
 				}
 			} else {
+				animations.Run.AdjustWeight(disabledWeightValue, fadeTime);
 				animations.WalkForward.AdjustWeight(disabledWeightValue, fadeTime);
 				animations.WalkRight.AdjustWeight(disabledWeightValue, fadeTime);
 				animations.WalkLeft.AdjustWeight(disabledWeightValue, fadeTime);

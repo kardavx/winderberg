@@ -1,5 +1,6 @@
 import Remo, { Client, Server, remote, throttleMiddleware } from "@rbxts/remo";
 import { t } from "@rbxts/t";
+import { $terrify } from "rbxts-transformer-t-new";
 import { State as profileState } from "shared/reflex/serverProfile";
 import { State as serverState } from "shared/reflex/serverState";
 
@@ -22,6 +23,9 @@ export default Remo.createRemotes({
 	SendChatMessage: remote<Server, [string]>(t.string).middleware(throttleMiddleware(0.1)),
 	ReceiveChatMessage: remote<Client, [string]>(t.string),
 
-	OpenTrunk: remote<Server, []>(),
+	OnPlayerFell: remote<Server, [number]>(t.number).middleware(throttleMiddleware(1)),
+
+	ReplicateInteraction: remote<Server, [string, BasePart | Model]>(t.string, $terrify<BasePart | Model>()),
+
 	TransferItem: remote<Server, ["External" | "Inventory", number]>(),
 });

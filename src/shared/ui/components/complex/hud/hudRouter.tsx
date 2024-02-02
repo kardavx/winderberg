@@ -9,7 +9,7 @@ import Stamina from "./bars/stamina";
 import Hunger from "./bars/hunger";
 import Thirst from "./bars/thirst";
 import Chat from "./chat/chat";
-import useProducerAsState from "shared/ui/util/useProducerAsState";
+import useProducerAsState from "shared/ui/hook/useProducerAsState";
 
 export default (props: CommonProps) => {
 	const [money] = useProducerAsState(props.serverProfile, (state) => state.money);

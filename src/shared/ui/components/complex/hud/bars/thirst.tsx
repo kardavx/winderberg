@@ -1,7 +1,7 @@
 import Roact from "@rbxts/roact";
 import Bar from "./bar";
 import { CommonProps } from "shared/types/UITypes";
-import useProducerAsState from "shared/ui/util/useProducerAsState";
+import useProducerAsState from "shared/ui/hook/useProducerAsState";
 import palette from "shared/ui/palette/palette";
 
 interface Props extends CommonProps {

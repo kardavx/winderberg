@@ -2,7 +2,7 @@ import Roact from "@rbxts/roact";
 import { CommonProps } from "shared/types/UITypes";
 import Center from "../../base/Center";
 import Text from "../../base/Text";
-import useProducerAsState from "shared/ui/util/useProducerAsState";
+import useProducerAsState from "shared/ui/hook/useProducerAsState";
 import Padding from "../../base/Padding";
 import getItemsWeight from "shared/util/getItemsWeight";
 import network from "shared/network/network";
@@ -94,7 +94,6 @@ export default (props: Props) => {
 							Image={"rbxassetid://6680261899"}
 							ImageColor3={palette.Text}
 							BackgroundTransparency={1}
-							Rotation={props.isExternal ? 180 : 0}
 							Visible={props.externalContainerOpen}
 							Event={{
 								MouseButton1Click: () => {
@@ -125,7 +124,13 @@ export default (props: Props) => {
 					Size={UDim2.fromScale(0.8, 1)}
 					Weight="Bold"
 					TextXAlignment={Enum.TextXAlignment.Left}
-					Text={props.isExternal ? "External" : "Inventory"}
+					Text={
+						props.isExternal
+							? containers[props.containerId]
+								? containers[props.containerId].name
+								: "External"
+							: "Inventory"
+					}
 					TextColor3={palette.Text}
 				/>
 				<Text

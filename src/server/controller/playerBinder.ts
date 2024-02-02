@@ -11,11 +11,45 @@ let nextUpdateTick = tick();
 
 const playerBinder: InitializerFunction = () => {
 	const maid = new Maid();
+	const characterMaids: { [name: string]: Maid } = {};
 
 	maid.GiveTask(
-		serverSignals.characterAdded.Connect((_, character: Model) => {
-			character.SetAttribute("interactionType", "Player");
-			character.AddTag("interaction");
+		serverSignals.characterAdded.Connect((player, character: Model) => {
+			const actualCharacter = character as Character;
+			actualCharacter.SetAttribute("interactionType", "Player");
+			actualCharacter.AddTag("interaction");
+
+			const playerProfile = getPlayerProfile(player);
+			if (playerProfile) {
+				playerProfile.producer.secureSetLastCharacterHealth(actualCharacter.Humanoid.Health);
+			}
+
+			characterMaids[player.Name] = new Maid();
+			characterMaids[player.Name].GiveTask(
+				actualCharacter.Humanoid.GetPropertyChangedSignal("Health").Connect(() => {
+					print("essa");
+
+					const playerProfile = getPlayerProfile(player);
+					if (!playerProfile) return;
+
+					print("essa");
+
+					if (actualCharacter.Humanoid.Health === 0) {
+						playerProfile.producer.secureSetLastCharacterHealth(undefined);
+					} else {
+						playerProfile.producer.secureSetLastCharacterHealth(actualCharacter.Humanoid.Health);
+					}
+				}),
+			);
+		}),
+	);
+
+	maid.GiveTask(
+		serverSignals.characterRemoving.Connect((player) => {
+			if (characterMaids[player.Name]) {
+				characterMaids[player.Name].DoCleaning();
+				delete characterMaids[player.Name];
+			}
 		}),
 	);
 
@@ -33,17 +67,27 @@ const playerBinder: InitializerFunction = () => {
 					});
 				}
 
-				print(producerState.lastPlayerPosition);
-				if (producerState.lastPlayerPosition) {
-					const deserializedVector = deserializeVector3(producerState.lastPlayerPosition);
-					if (player.Character) {
+				if (player.Character) {
+					if (producerState.lastPlayerPosition) {
+						const deserializedVector = deserializeVector3(producerState.lastPlayerPosition);
 						player.Character.PivotTo(new CFrame(deserializedVector));
-					} else {
-						player.CharacterAdded.Once((character: Model) => {
-							task.wait();
-							character.PivotTo(new CFrame(deserializedVector));
-						});
 					}
+
+					if (producerState.lastCharacterHealth !== undefined) {
+						(player.Character as Character).Humanoid.Health = producerState.lastCharacterHealth;
+					}
+				} else {
+					player.CharacterAdded.Once((character: Model) => {
+						task.wait();
+						if (producerState.lastPlayerPosition) {
+							const deserializedVector = deserializeVector3(producerState.lastPlayerPosition);
+							character.PivotTo(new CFrame(deserializedVector));
+						}
+
+						if (producerState.lastCharacterHealth !== undefined) {
+							(character as Character).Humanoid.Health = producerState.lastCharacterHealth;
+						}
+					});
 				}
 			});
 		}),
