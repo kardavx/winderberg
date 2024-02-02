@@ -8,6 +8,7 @@ import movement from "shared/controller/movement";
 import cameraEffects from "shared/controller/cameraEffects";
 import clientPlayerData from "shared/controller/clientPlayerData";
 import animate from "shared/controller/animate";
+import fallDamage from "shared/controller/fallDamage";
 import nametagCreator from "shared/controller/nametagCreator";
 
 StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.All, false);
@@ -23,6 +24,7 @@ const onCharacterAdded = (character: Character) => {
 
 	characterMaid.GiveTask(camera(character));
 	characterMaid.GiveTask(animate(character));
+	characterMaid.GiveTask(fallDamage(character));
 	characterMaid.GiveTask(cameraEffects(character));
 	characterMaid.GiveTask(movement(character));
 	characterMaid.GiveTask(nametagCreator());

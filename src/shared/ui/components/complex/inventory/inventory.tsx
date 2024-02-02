@@ -1,6 +1,6 @@
 import Roact from "@rbxts/roact";
 import { CommonProps } from "shared/types/UITypes";
-import useProducerAsState from "shared/ui/util/useProducerAsState";
+import useProducerAsState from "shared/ui/hook/useProducerAsState";
 import GenericPopup from "../../base/GenericPopup";
 import Center from "../../base/Center";
 import Maid from "@rbxts/maid";
@@ -11,8 +11,6 @@ export default (props: CommonProps) => {
 	const [isOpen] = useProducerAsState(props.clientState, (state) => state.inventoryOpen);
 	const [inventoryContainerId] = useProducerAsState(props.serverProfile, (state) => state.inventoryContainerId);
 	const [externalContainerId] = useProducerAsState(props.serverProfile, (state) => state.externalContainerId);
-
-	if (!isOpen && externalContainerId !== undefined) props.serverProfile.closeExternalContainer();
 
 	if (isOpen) {
 		props.clientState.addMouseEnabler("inventory");
@@ -48,6 +46,28 @@ export default (props: CommonProps) => {
 
 		maid.GiveTask(
 			OnKeyClicked("inventoryOpen", () => props.clientState.setInventoryOpen(!isOpen), Enum.KeyCode.Tab),
+		);
+
+		maid.GiveTask(
+			props.clientState.subscribe(
+				(state) => state.inventoryOpen,
+				(isInventoryOpen) => {
+					if (!isInventoryOpen && props.serverProfile.getState().externalContainerId !== undefined) {
+						props.serverProfile.closeExternalContainer();
+					}
+				},
+			),
+		);
+
+		maid.GiveTask(
+			props.serverProfile.subscribe(
+				(state) => state.externalContainerId,
+				(containerId) => {
+					if (containerId !== undefined && props.clientState.getState().inventoryOpen === false) {
+						props.clientState.setInventoryOpen(true);
+					}
+				},
+			),
 		);
 
 		return () => maid.DoCleaning();

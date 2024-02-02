@@ -2,12 +2,13 @@ import { clientProducer } from "shared/controller/clientPlayerData";
 import { icons } from "./notificationData";
 import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
 import LocalPlayer from "shared/util/LocalPlayer";
-import network from "shared/network/network";
 
 interface SubInteraction {
 	name: string;
 	icon?: string;
-	functionality: (adornee: AllowedInteractionInstances) => void;
+	serverActionId?: string;
+	validator?: (adornee: AllowedInteractionInstances) => boolean;
+	functionality?: (adornee: AllowedInteractionInstances) => void;
 }
 
 interface Interactions {
@@ -109,10 +110,7 @@ const interactionData: Interactions = {
 	CarTrunk: [
 		{
 			name: "Przeszukaj",
-			functionality: () => {
-				clientProducer.setInventoryOpen(true);
-				network.OpenTrunk.fire();
-			},
+			serverActionId: "Search",
 		},
 		...carInteractions,
 	],

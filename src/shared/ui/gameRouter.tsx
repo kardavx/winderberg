@@ -12,6 +12,8 @@ import CurrentCamera from "shared/util/CurrentCamera";
 import clientSignals from "shared/signal/clientSignals";
 import Inventory from "./components/complex/inventory/inventory";
 import Menu from "./components/complex/menu/menu";
+import Maid from "@rbxts/maid";
+import LocalPlayer from "shared/util/LocalPlayer";
 
 export default (props: {
 	clientState: ClientProducer;
@@ -21,19 +23,27 @@ export default (props: {
 	const isLoaded = props.serverProfile !== undefined && props.serverState !== undefined;
 
 	const [viewportSize, setViewportSize] = Roact.useState(CurrentCamera.ViewportSize);
-	const commonProps = { ...props } as CommonProps;
+	const [character, setCharacter] = Roact.useState(undefined as Character | undefined);
+
+	const commonProps = { ...props, viewportSize, character } as CommonProps;
 
 	Roact.useEffect(() => {
-		const connection = clientSignals.onRender.Connect((deltaTime: number) => {
-			const newSize = CurrentCamera.ViewportSize;
-			if (viewportSize === newSize) return;
+		const maid = new Maid();
 
-			setViewportSize(newSize);
-		});
+		if (LocalPlayer.Character && character === undefined) setCharacter(LocalPlayer.Character as Character);
+		maid.GiveTask(LocalPlayer.CharacterAdded.Connect((character) => setCharacter(character as Character)));
+		maid.GiveTask(LocalPlayer.CharacterRemoving.Connect(() => setCharacter(undefined)));
 
-		return () => {
-			connection.Disconnect();
-		};
+		maid.GiveTask(
+			clientSignals.onRender.Connect((deltaTime: number) => {
+				const newSize = CurrentCamera.ViewportSize;
+				if (viewportSize === newSize) return;
+
+				setViewportSize(newSize);
+			}),
+		);
+
+		return () => maid.DoCleaning();
 	});
 
 	return (

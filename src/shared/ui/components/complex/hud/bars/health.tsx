@@ -10,6 +10,7 @@ interface Props {
 
 export default (props: Props) => {
 	let initialHealth = 100;
+
 	if (LocalPlayer.Character) {
 		initialHealth = (LocalPlayer.Character as Character).Humanoid.Health;
 	}
@@ -22,6 +23,8 @@ export default (props: Props) => {
 		const character = LocalPlayer.Character as Character;
 
 		if (character) {
+			if (health !== character.Humanoid.Health) setHealth(character.Humanoid.Health);
+
 			maid.GiveTask(
 				character.Humanoid.GetPropertyChangedSignal("Health").Connect(() => {
 					setHealth(character.Humanoid.Health);

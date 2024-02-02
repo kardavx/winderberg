@@ -5,11 +5,10 @@ import { getMoveDirection } from "./camera/camera";
 import { lerp } from "@rbxts/pretty-react-hooks";
 import { clientProducer } from "./clientPlayerData";
 import clampedInverseLerp from "shared/util/clampedInverseLerp";
-import OnKeyClicked from "shared/util/OnKeyClicked";
 import onKeyClickedWithPriority from "shared/util/onKeyClickedWithPriority";
 
-const walkSpeed = 8;
-const runSpeed = 16;
+export const walkSpeed = 8;
+export const runSpeed = 16;
 
 // te wartosci sa skalowane przez deltatime jeszcze jkbc
 const staminaUsage = 5;
@@ -19,13 +18,15 @@ const jumpCooldown = 2;
 const jumpStaminaUsage = 2;
 
 const staminaReplenishCooldown = 2;
+let targetWalkspeed = walkSpeed;
+
+export const getTargetWalkspeed = (): number => targetWalkspeed;
 
 const movement: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
 
 	let runRequest = false;
 
-	let targetWalkspeed = walkSpeed;
 	let limitReached = false;
 
 	let nextJumpTick = tick();

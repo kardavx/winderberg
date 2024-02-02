@@ -6,7 +6,8 @@ export interface CommonProps {
 	clientState: ClientProducer;
 	serverProfile: ProfileProducer;
 	serverState: ServerProducer;
-	screenResolution: Vector2;
+	viewportSize: Vector2;
+	character: Character;
 }
 
 export interface RouterProps {

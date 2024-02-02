@@ -14,6 +14,7 @@ import Text from "../../base/Text";
 import LocalPlayer from "shared/util/LocalPlayer";
 import interactionModelMock from "./interactionModelMock";
 import palette from "shared/ui/palette/palette";
+import network from "shared/network/network";
 
 export type AllowedInteractionInstances = BasePart | Model;
 
@@ -87,7 +88,12 @@ export default (props: CommonProps) => {
 					BackgroundColor3={palette.Base}
 					Event={{
 						MouseButton1Click: () => {
-							subInteraction.functionality(interactingWith);
+							if (subInteraction.functionality) {
+								subInteraction.functionality(interactingWith);
+							}
+							if (subInteraction.serverActionId !== undefined) {
+								network.ReplicateInteraction.fire(subInteraction.serverActionId, interactingWith);
+							}
 							setInteractionMode(false);
 						},
 					}}
