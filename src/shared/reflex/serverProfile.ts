@@ -1,4 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
+import { SerializedVector3, serializeVector3 } from "shared/util/serializer";
 
 const names: string[] = ["Jason", "Nathan", "Rick"];
 const surnames: string[] = ["Smith", "White", "Grime", "Madador"];
@@ -15,6 +16,8 @@ export interface State {
 
 	inventoryContainerId?: number;
 	externalContainerId?: number;
+
+	lastPlayerPosition?: SerializedVector3;
 }
 
 export interface Actions {
@@ -25,6 +28,8 @@ export interface Actions {
 	secureRemoveThirst: (amountToSubtract: number) => void;
 
 	secureSetInventoryContainerId: (containerId: number) => void;
+
+	secureSetLastPlayerPosition: (position: Vector3 | undefined) => void;
 
 	secureOpenExternalContainer: (containerId: number) => void;
 	closeExternalContainer: () => void;
@@ -42,6 +47,7 @@ export const defaultState: State = {
 };
 
 export const saveExceptions: Partial<keyof State>[] = ["externalContainerId"];
+export const replicationExceptions: Partial<keyof Actions>[] = ["secureSetLastPlayerPosition"];
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
@@ -92,6 +98,12 @@ export const CreateProducer = (initialState: State) => {
 		closeExternalContainer: (oldState: State): State => {
 			const state = { ...oldState };
 			state.externalContainerId = undefined;
+
+			return state;
+		},
+		secureSetLastPlayerPosition: (oldState: State, position: Vector3 | undefined) => {
+			const state = { ...oldState };
+			state.lastPlayerPosition = position === undefined ? undefined : serializeVector3(position);
 
 			return state;
 		},

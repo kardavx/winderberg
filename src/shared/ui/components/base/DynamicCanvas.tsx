@@ -20,13 +20,13 @@ export default (props: Props) => {
 		return () => conn.Disconnect();
 	});
 
-	if (isStatic) {
-		return <frame {...baseProps}>{props.children}</frame>;
-	} else {
+	// if (isStatic) {
+	// 	return <frame {...baseProps}>{props.children}</frame>;
+	// } else {
 		return (
 			<canvasgroup {...baseProps} {...canvasProps}>
 				{props.children}
 			</canvasgroup>
 		);
-	}
+	// }
 };

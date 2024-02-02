@@ -3,14 +3,17 @@ import { SaveableStateData } from "shared/types/ContainerTypes";
 export type ItemTypes = ["Primary", "Secondary", "Food", "Water"];
 export type ItemType = ItemTypes[number];
 
-type ItemStateSchema = {
+export type TypeStateSchema = {
 	[itemType in ItemType]: { weight: number; [key: string]: SaveableStateData };
 };
 
-export interface ItemState extends ItemStateSchema {}
+export type ItemStateSchema = {
+	[itemType in string]: { [key: string]: SaveableStateData };
+};
 
 export const itemTypes: ItemTypes = ["Primary", "Secondary", "Food", "Water"];
-export const defaultItemState: ItemState = {
+
+export const defaultTypeState: TypeStateSchema = {
 	Primary: {
 		weight: 10,
 	},
@@ -23,6 +26,10 @@ export const defaultItemState: ItemState = {
 	Water: {
 		weight: 1,
 	},
+};
+
+export const defaultItemState: ItemStateSchema = {
+	"Testowy item": {},
 };
 
 export const itemDisplayTypes: { [itemType in ItemType]: string } = {

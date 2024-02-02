@@ -1,7 +1,6 @@
 import Roact from "@rbxts/roact";
 import getViewportScaledNumber from "shared/ui/util/getViewportScaledNumber";
 import Stroke from "./Stroke";
-import { Mocha } from "@rbxts/catppuccin";
 
 interface Props extends Roact.JsxInstanceProperties<TextLabel>, Roact.PropsWithChildren {
 	TextSize?: number;

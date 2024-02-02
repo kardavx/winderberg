@@ -8,12 +8,14 @@ import {
 	CreateProducer as CreateProfileProducer,
 	ProfileProducer,
 	State as profileState,
+	replicationExceptions as profileReplicationExceptions,
 } from "shared/reflex/serverProfile";
 
 import {
 	CreateProducer as CreateServerProducer,
 	ServerProducer,
 	State as serverProdState,
+	replicationExceptions as serverReplicationExceptions,
 } from "shared/reflex/serverState";
 
 export let clientProducer: ClientProducer = CreateClientProducer(defaultState);
@@ -25,6 +27,9 @@ export let isServerDataLoaded: boolean = false;
 
 let nextProfileActionIsReplicated = false;
 let nextStateActionIsReplicated = false;
+
+const profileReplicationQueue: (() => void)[] = [];
+const stateReplicationQueue: (() => void)[] = [];
 
 export const getServerProfile = () => {
 	return serverProfile;
@@ -39,6 +44,16 @@ const replicateProfileMiddleware = () => {
 		(...args: unknown[]) => {
 			if (nextProfileActionIsReplicated) {
 				nextProfileActionIsReplicated = false;
+
+				if (profileReplicationQueue.size() > 0) {
+					profileReplicationQueue.remove(0)!();
+				}
+
+				return dispatch(...args);
+			}
+
+			const [isSecureAction] = name.find("^secure");
+			if (profileReplicationExceptions.find((value: string) => value === name) || isSecureAction !== undefined) {
 				return dispatch(...args);
 			}
 
@@ -56,6 +71,16 @@ const replicateStateMiddleware = () => {
 		(...args: unknown[]) => {
 			if (nextStateActionIsReplicated) {
 				nextStateActionIsReplicated = false;
+
+				if (stateReplicationQueue.size() > 0) {
+					stateReplicationQueue.remove(0)!();
+				}
+
+				return dispatch(...args);
+			}
+
+			const [isSecureAction] = name.find("^secure");
+			if (serverReplicationExceptions.find((value: string) => value === name) || isSecureAction !== undefined) {
 				return dispatch(...args);
 			}
 
@@ -164,28 +189,45 @@ const clientPlayerData: InitializerFunction = () => {
 		network.GetReplicatedProfile.connect((data) => {
 			print("on profile repliation");
 			if (!isPlayerDataLoaded) {
-				warn("Queued store action before player data loaded");
+				warn("Queued profile action before player data loaded");
 				gameSignals.playerDataLoaded.Wait();
 			}
 
-			nextProfileActionIsReplicated = true;
-			const actualProfile = serverProfile as unknown as withCallSignature;
-			actualProfile[data.name](...data.arguments);
+			if (nextProfileActionIsReplicated) {
+				profileReplicationQueue.push(() => {
+					nextProfileActionIsReplicated = true;
+					const actualProfile = serverProfile as unknown as withCallSignature;
+					actualProfile[data.name](...data.arguments);
+				});
+			} else {
+				nextProfileActionIsReplicated = true;
+				const actualProfile = serverProfile as unknown as withCallSignature;
+				actualProfile[data.name](...data.arguments);
+			}
 		}),
 	);
 
 	maid.GiveTask(
 		network.GetReplicatedState.connect((data) => {
-			print("on state repliation");
+			print(`[STATE REPLICATION] ${data.name} with arguments`, data.arguments);
 			if (!isServerDataLoaded) {
 				warn("Queued store action before server data loaded");
-				gameSignals.serverDataLoaded.Wait();
+				return;
 			}
 
-			nextStateActionIsReplicated = true;
+			if (nextStateActionIsReplicated) {
+				stateReplicationQueue.push(() => {
+					nextStateActionIsReplicated = true;
 
-			const actualProfile = serverState as unknown as withCallSignature;
-			actualProfile[data.name](...data.arguments);
+					const actualProfile = serverState as unknown as withCallSignature;
+					actualProfile[data.name](...data.arguments);
+				});
+			} else {
+				nextStateActionIsReplicated = true;
+
+				const actualProfile = serverState as unknown as withCallSignature;
+				actualProfile[data.name](...data.arguments);
+			}
 		}),
 	);
 

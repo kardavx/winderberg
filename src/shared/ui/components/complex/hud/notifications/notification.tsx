@@ -1,9 +1,9 @@
 import Roact from "@rbxts/roact";
 import Padding from "../../../base/Padding";
-import { Mocha } from "@rbxts/catppuccin";
 import Text from "../../../base/Text";
 import getViewportScaledUdim from "shared/ui/util/getViewportScaledUdim";
 import { icons } from "shared/data/notificationData";
+import palette from "shared/ui/palette/palette";
 
 interface Props {
 	title: string;
@@ -17,7 +17,7 @@ export default (props: Props) => {
 		<textbutton
 			Size={UDim2.fromScale(1, 1)}
 			AutomaticSize={Enum.AutomaticSize.Y}
-			BackgroundColor3={Mocha.Base}
+			BackgroundColor3={palette.Base}
 			AutoButtonColor={false}
 			Text=""
 			BorderSizePixel={0}
@@ -38,7 +38,7 @@ export default (props: Props) => {
 			<frame Size={UDim2.fromScale(0.2, 1)} BackgroundTransparency={1}>
 				<uilistlayout HorizontalAlignment={Enum.HorizontalAlignment.Center} />
 
-				<frame Size={UDim2.fromScale(1, 1)} BackgroundColor3={Mocha.Blue} BorderSizePixel={0}>
+				<frame Size={UDim2.fromScale(1, 1)} BackgroundColor3={palette.Blue} BorderSizePixel={0}>
 					<uicorner CornerRadius={new UDim(0.25, 0)} />
 					<uiaspectratioconstraint AspectRatio={1 / 1} />
 					<uigradient
@@ -61,7 +61,7 @@ export default (props: Props) => {
 				<uilistlayout VerticalAlignment={Enum.VerticalAlignment.Center} />
 				<Text
 					Size={UDim2.fromScale(1, 0)}
-					TextColor3={Mocha.Text}
+					TextColor3={palette.Text}
 					TextSize={20}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					CustomTextScaled={true}
@@ -72,7 +72,7 @@ export default (props: Props) => {
 				/>
 				<Text
 					Size={UDim2.fromScale(1, 0)}
-					TextColor3={Mocha.Text}
+					TextColor3={palette.Text}
 					CustomTextScaled={true}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					TextWrapped={true}

@@ -71,6 +71,10 @@ const movement: CharacterInitializerFunction = (character: Character) => {
 				hasJumped = false;
 				nextJumpTick = tick() + jumpCooldown;
 			}
+			if (newValue === Enum.HumanoidStateType.Climbing) {
+				hasJumped = false;
+				nextJumpTick = tick() + jumpCooldown;
+			}
 			if (newValue === Enum.HumanoidStateType.Jumping) {
 				const state = clientProducer.getState();
 

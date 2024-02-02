@@ -1,16 +1,26 @@
 import { createContainer } from "server/module/containers";
 import { trunkContainerMaxWeight } from "shared/data/containerData";
 import network from "shared/network/network";
-import { getPlayerProfile } from "./serverData";
+import { getPlayerProfile, waitForServerState } from "./serverData";
 
 const trunkContainerTest: InitializerFunction = () => {
-	let containerId: number;
+	let containerId: number | undefined;
 
-	createContainer(trunkContainerMaxWeight).andThen(
-		(incomingContainerId: number) => (containerId = incomingContainerId),
-	);
+	waitForServerState().andThen((serverState) => {
+		const producerState = serverState.producer.getState();
+		if (producerState.carTrunkContainerId !== undefined) {
+			containerId = producerState.carTrunkContainerId;
+		} else {
+			createContainer(trunkContainerMaxWeight).andThen((incomingContainerId: number) => {
+				serverState.producer.setCarTrunkContainerId(incomingContainerId);
+				containerId = incomingContainerId;
+			});
+		}
+	});
 
 	const cleanup = network.OpenTrunk.connect((player: Player) => {
+		if (containerId === undefined) return;
+
 		const playerProfile = getPlayerProfile(player);
 		if (!playerProfile) return;
 

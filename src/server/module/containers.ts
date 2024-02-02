@@ -6,13 +6,13 @@ const containerNotFound = () => `NO_CONTAINER`;
 const itemNotFound = () => `NO_ITEM`;
 const tooMuchWeight = () => `TOO_MUCH_WEIGHT`;
 
-export const createContainer = (maxWeight: number): Promise<number> => {
+export const createContainer = (maxWeight: number, name?: string): Promise<number> => {
 	return new Promise((resolve) => {
 		waitForServerState().andThen((serverState) => {
 			const producerState = serverState.producer.getState();
 			const containerId = producerState.containers.size();
 
-			serverState.producer.secureCreateContainer(maxWeight);
+			serverState.producer.secureCreateContainer(maxWeight, name);
 			resolve(containerId);
 		});
 	});

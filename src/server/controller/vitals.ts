@@ -2,10 +2,10 @@ import serverSignals from "shared/signal/serverSignals";
 import { getPlayerProfile } from "./serverData";
 import Maid from "@rbxts/maid";
 
-const hungerUsageFactor = 5;
-const thirstUsageFactor = 10;
+const hungerUsageFactor = 1;
+const thirstUsageFactor = 2;
 
-const updateInterval = 5;
+const updateInterval = 10;
 
 const vitals: InitializerFunction = () => {
 	const maid = new Maid();

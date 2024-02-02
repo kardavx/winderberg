@@ -10,6 +10,7 @@ export type ContainerItem = {
 
 export type ContainerSchema = {
 	maxWeight: number;
+	name: string;
 	content: ContainerItem[];
 };
 

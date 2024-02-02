@@ -1,7 +1,7 @@
-import { Mocha } from "@rbxts/catppuccin";
 import Roact from "@rbxts/roact";
 import Stroke from "shared/ui/components/base/Stroke";
 import useSpring from "shared/ui/hook/useSpring";
+import palette from "shared/ui/palette/palette";
 
 interface Props {
 	icon: string;
@@ -16,8 +16,8 @@ export default (props: Props) => {
 	setProgress(props.progress / 100);
 
 	return (
-		<frame Size={props.Size} BorderSizePixel={0} BackgroundColor3={Mocha.Base}>
-			<Stroke Thickness={2} Color={Mocha.Text} />
+		<frame Size={props.Size} BorderSizePixel={0} BackgroundColor3={palette.Base}>
+			<Stroke Thickness={2} Color={palette.Text} />
 			<frame
 				BackgroundColor3={props.BackgroundColor3}
 				BorderSizePixel={0}

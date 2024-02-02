@@ -1,10 +1,10 @@
 import Roact from "@rbxts/roact";
 import Center from "./Center";
 import useSpring from "shared/ui/hook/useSpring";
-import { Mocha } from "@rbxts/catppuccin";
 import Text from "./Text";
 import Padding from "./Padding";
 import clientSignals from "shared/signal/clientSignals";
+import palette from "shared/ui/palette/palette";
 
 interface Image {
 	id: string;
@@ -55,7 +55,7 @@ export default (props: Props) => {
 				Text=""
 				AutoButtonColor={false}
 				BorderSizePixel={0}
-				BackgroundColor3={imageIndex === index ? Mocha.Subtext1 : Mocha.Subtext0}
+				BackgroundColor3={imageIndex === index ? palette.Subtext1 : palette.Subtext0}
 				Event={{
 					MouseButton1Click: () => {
 						setNextAutoChange(tick() + autoChangeTime);
@@ -107,13 +107,13 @@ export default (props: Props) => {
 						TextXAlignment={Enum.TextXAlignment.Left}
 						Weight="Bold"
 						TextSize={20}
-						TextColor3={Mocha.Text}
+						TextColor3={palette.Text}
 						Text={props.Images[imageIndex].title}
 					/>
 
 					<Text
 						Size={UDim2.fromScale(1, 0.5)}
-						TextColor3={Mocha.Subtext1}
+						TextColor3={palette.Subtext1}
 						TextSize={20}
 						TextXAlignment={Enum.TextXAlignment.Left}
 						Text={props.Images[imageIndex].description}

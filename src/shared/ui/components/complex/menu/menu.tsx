@@ -2,10 +2,10 @@ import Roact from "@rbxts/roact";
 import { CommonProps } from "shared/types/UITypes";
 import Text from "../../base/Text";
 import Center from "../../base/Center";
-import { Mocha } from "@rbxts/catppuccin";
 import StatusIcon from "./statusIcon";
 import Carousel from "../../base/Carousel";
 import { setInterval } from "@rbxts/set-timeout";
+import palette from "shared/ui/palette/palette";
 
 export default (props: CommonProps) => {
 	const [active, setActive] = Roact.useState(false);
@@ -27,7 +27,7 @@ export default (props: CommonProps) => {
 				<imagelabel
 					Size={UDim2.fromScale(0.4, 0.4)}
 					BackgroundTransparency={1}
-					ImageColor3={Mocha.Text}
+					ImageColor3={palette.Text}
 					ScaleType={Enum.ScaleType.Crop}
 					Image={"rbxassetid://16130691292"}
 				>
@@ -39,7 +39,7 @@ export default (props: CommonProps) => {
 
 					<Text
 						Text={string.upper("JESTEŚMY AKTUALNIE")}
-						TextColor3={Mocha.Subtext0}
+						TextColor3={palette.Subtext0}
 						Weight="Bold"
 						TextSize={40}
 						Size={UDim2.fromScale(1, 0.25)}
@@ -50,7 +50,7 @@ export default (props: CommonProps) => {
 
 						<StatusIcon isActive={active} />
 						<Text
-							TextColor3={active === true ? Mocha.Green : Mocha.Red}
+							TextColor3={active === true ? palette.Green : palette.Red}
 							TextSize={30}
 							Text={string.upper(`${active === true ? "ONLINE" : "OFFLINE"}`)}
 							Size={UDim2.fromScale(0.2, 1)}
@@ -86,7 +86,7 @@ export default (props: CommonProps) => {
 				AnchorPoint={new Vector2(0.5, 0.5)}
 				Position={UDim2.fromScale(0.5, 0.5)}
 				ZIndex={-1}
-				BackgroundColor3={Mocha.Base}
+				BackgroundColor3={palette.Base}
 			>
 				<uigradient
 					Transparency={

@@ -3,6 +3,7 @@ import ReactRoblox from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
 import { RunService } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
+import { inventoryContainerMaxWeight, trunkContainerMaxWeight } from "shared/data/containerData";
 import { CreateProducer as CreateClientProducer, defaultState as defaultClientState } from "shared/reflex/clientState";
 import {
 	CreateProducer as CreateProfileProducer,
@@ -27,6 +28,36 @@ export = (target: ScreenGui): (() => void) => {
 		const clientStateProducer = CreateClientProducer(defaultClientState);
 		const serverProfileProducer = CreateProfileProducer(defaultProfileState);
 		const serverStateProducer = CreateServerProducer(defaultServerState);
+
+		const inventoryItems = 10;
+		const externalItems = 5;
+
+		clientStateProducer.setInventoryOpen(true);
+		serverStateProducer.secureCreateContainer(inventoryContainerMaxWeight);
+		serverStateProducer.secureCreateContainer(trunkContainerMaxWeight);
+
+		for (let i = 0; i < inventoryItems; i++) {
+			serverStateProducer.secureAddItemToContainer(0, {
+				name: "debugItem",
+				type: "Food",
+				state: {
+					weight: 2,
+				},
+			});
+		}
+
+		for (let i = 0; i < externalItems; i++) {
+			serverStateProducer.secureAddItemToContainer(1, {
+				name: "debugItem",
+				type: "Food",
+				state: {
+					weight: 2,
+				},
+			});
+		}
+
+		serverProfileProducer.secureSetInventoryContainerId(0);
+		serverProfileProducer.secureOpenExternalContainer(1);
 
 		root.render(
 			Roact.createElement(gameRouter, {

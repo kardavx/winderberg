@@ -1,8 +1,8 @@
-import { Mocha } from "@rbxts/catppuccin";
 import Roact from "@rbxts/roact";
 import Padding from "shared/ui/components/base/Padding";
 import Text from "shared/ui/components/base/Text";
 import useSpring from "shared/ui/hook/useSpring";
+import palette from "shared/ui/palette/palette";
 
 interface Props {
 	isActive: boolean;
@@ -26,7 +26,7 @@ export default (props: Props) => {
 	return (
 		<frame
 			Size={UDim2.fromScale(0.5, 0.5)}
-			BackgroundColor3={props.isActive ? Mocha.Green : Mocha.Red}
+			BackgroundColor3={props.isActive ? palette.Green : palette.Red}
 			BorderSizePixel={0}
 			Event={{
 				MouseEnter: () => {
@@ -49,7 +49,7 @@ export default (props: Props) => {
 				})}
 				GroupTransparency={popupShownFactor.map((factor: number) => factor)}
 				AutomaticSize={Enum.AutomaticSize.XY}
-				BackgroundColor3={Mocha.Mantle}
+				BackgroundColor3={palette.Mantle}
 				Event={{
 					MouseEnter: () => {
 						setHoveringOverPopup(true);
@@ -68,7 +68,7 @@ export default (props: Props) => {
 				<Text
 					TextScaled={false}
 					Text={props.isActive === true ? messages.activeMessage : messages.inactiveMessage}
-					TextColor3={Mocha.Text}
+					TextColor3={palette.Text}
 					AutomaticSize={Enum.AutomaticSize.XY}
 					TextSize={30}
 					ZIndex={100}

@@ -4,13 +4,15 @@ import { ContainerItem, ContainersSchema } from "shared/types/ContainerTypes";
 export interface State {
 	serverStartTick: number;
 	containers: ContainersSchema;
+	carTrunkContainerId?: number;
 }
 
 export interface Actions {
-	secureCreateContainer: (maxWeight: number) => void;
+	secureCreateContainer: (maxWeight: number, name?: string) => void;
 	secureAddItemToContainer: (containerId: number, item: ContainerItem) => void;
 	secureRemoveItemFromContainer: (containerId: number, index: number) => void;
 	secureSetServerStartTick: (tick: number) => void;
+	setCarTrunkContainerId: (containerId: number) => void;
 }
 
 export const defaultState: State = {
@@ -19,6 +21,7 @@ export const defaultState: State = {
 };
 
 export const saveExceptions: Partial<keyof State>[] = ["serverStartTick"];
+export const replicationExceptions: Partial<keyof Actions>[] = [];
 
 export const CreateProducer = (initialState: State) => {
 	const producer = createProducer(initialState, {
@@ -28,11 +31,12 @@ export const CreateProducer = (initialState: State) => {
 
 			return state;
 		},
-		secureCreateContainer: (oldState: State, maxWeight: number): State => {
+		secureCreateContainer: (oldState: State, maxWeight: number, name: string = "Kontener"): State => {
 			const state = { ...oldState };
 			state.containers = [...state.containers];
 			state.containers.push({
 				maxWeight,
+				name,
 				content: [],
 			});
 
@@ -61,6 +65,12 @@ export const CreateProducer = (initialState: State) => {
 			state.containers[containerId] = { ...state.containers[containerId] };
 			state.containers[containerId].content = [...state.containers[containerId].content];
 			state.containers[containerId].content.remove(index);
+
+			return state;
+		},
+		setCarTrunkContainerId: (oldState: State, containerId: number): State => {
+			const state = { ...oldState };
+			state.carTrunkContainerId = containerId;
 
 			return state;
 		},

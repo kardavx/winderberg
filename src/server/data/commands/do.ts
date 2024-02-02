@@ -1,9 +1,9 @@
-import { Mocha } from "@rbxts/catppuccin";
 import getPlayerNameAndSurname from "server/util/getPlayerNameAndSurname";
+import palette from "shared/ui/palette/palette";
 
 const doCommand: CommandServerData = {
 	darkens: true,
-	color: Mocha.Blue,
+	color: palette.Blue,
 	functionality: (sender: Player, validate: (sender: Player, message: string) => boolean, message: string[]) => {
 		const senderName = getPlayerNameAndSurname(sender);
 		const sendersMessage = message.join(" ");

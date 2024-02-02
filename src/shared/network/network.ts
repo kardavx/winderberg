@@ -6,10 +6,18 @@ import { State as serverState } from "shared/reflex/serverState";
 export default Remo.createRemotes({
 	GetPlayerData: remote<Server, []>().returns<profileState | undefined>(),
 	GetServerData: remote<Server, []>().returns<serverState | undefined>(),
-	ReplicateProfile: remote<Server, [{ name: string; arguments: [...args: unknown[]] }]>(),
-	ReplicateState: remote<Server, [{ name: string; arguments: [...args: unknown[]] }]>(),
-	GetReplicatedProfile: remote<Client, [{ name: string; arguments: [...args: unknown[]] }]>(),
-	GetReplicatedState: remote<Client, [{ name: string; arguments: [...args: unknown[]] }]>(),
+	ReplicateProfile: remote<Server, [{ name: string; arguments: [...args: unknown[]] }]>(
+		t.interface({ name: t.string, arguments: t.array(t.any) }),
+	),
+	ReplicateState: remote<Server, [{ name: string; arguments: [...args: unknown[]] }]>(
+		t.interface({ name: t.string, arguments: t.array(t.any) }),
+	),
+	GetReplicatedProfile: remote<Client, [{ name: string; arguments: [...args: unknown[]] }]>(
+		t.interface({ name: t.string, arguments: t.array(t.any) }),
+	),
+	GetReplicatedState: remote<Client, [{ name: string; arguments: [...args: unknown[]] }]>(
+		t.interface({ name: t.string, arguments: t.array(t.any) }),
+	),
 
 	SendChatMessage: remote<Server, [string]>(t.string).middleware(throttleMiddleware(0.1)),
 	ReceiveChatMessage: remote<Client, [string]>(t.string),

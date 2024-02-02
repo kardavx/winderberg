@@ -1,4 +1,3 @@
-import { Mocha } from "@rbxts/catppuccin";
 import Maid from "@rbxts/maid";
 import Roact from "@rbxts/roact";
 import commands from "shared/data/commands";
@@ -9,6 +8,7 @@ import Stroke from "shared/ui/components/base/Stroke";
 import Text from "shared/ui/components/base/Text";
 import TextBox from "shared/ui/components/base/TextBox";
 import useSpring from "shared/ui/hook/useSpring";
+import palette from "shared/ui/palette/palette";
 import getViewportScaledNumber from "shared/ui/util/getViewportScaledNumber";
 import getViewportScaledUdim from "shared/ui/util/getViewportScaledUdim";
 import OnKeyClicked from "shared/util/OnKeyClicked";
@@ -67,13 +67,13 @@ export default (props: CommonProps) => {
 	messages.forEach((message: string, index: number) => {
 		renderedMessages.push(
 			<Text
-				TextColor3={new Color3(1, 1, 1)}
+				TextColor3={palette.Text}
 				Stroke={10}
 				Text={message}
 				Weight="Bold"
 				LayoutOrder={index}
 				TextStrokeTransparency={0}
-				TextStrokeColor3={Mocha.Base}
+				TextStrokeColor3={palette.Base}
 				Size={UDim2.fromScale(1, 0)}
 				CustomTextScaled={true}
 				TextXAlignment={Enum.TextXAlignment.Left}
@@ -152,13 +152,13 @@ export default (props: CommonProps) => {
 				Size={UDim2.fromScale(1, 0.79525)}
 				BorderSizePixel={0}
 				BackgroundTransparency={shownFactor.map((factor: number) => factor)}
-				BackgroundColor3={Mocha.Base}
+				BackgroundColor3={palette.Base}
 			>
 				<uicorner CornerRadius={getViewportScaledUdim(10)} />
 				<Stroke
 					Thickness={getViewportScaledNumber(1.5)}
 					Transparency={shownFactor.map((factor: number) => factor)}
-					Color={Mocha.Text}
+					Color={palette.Text}
 				/>
 				<Padding Size={15} />
 				<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1} ClipsDescendants={true}>
@@ -179,13 +179,13 @@ export default (props: CommonProps) => {
 				AutomaticSize={Enum.AutomaticSize.Y}
 				GroupTransparency={shownFactor.map((factor: number) => factor)}
 				BackgroundTransparency={0}
-				BackgroundColor3={Mocha.Base}
+				BackgroundColor3={palette.Base}
 			>
 				<uicorner CornerRadius={getViewportScaledUdim(10)} />
 				<Stroke
 					Thickness={getViewportScaledNumber(1.5)}
 					Transparency={shownFactor.map((factor: number) => factor)}
-					Color={Mocha.Text}
+					Color={palette.Text}
 				/>
 				<Text
 					Size={UDim2.fromScale(1, 1)}
@@ -194,7 +194,7 @@ export default (props: CommonProps) => {
 					Text={suggestedCommand}
 					Weight="Bold"
 					TextWrapped={true}
-					TextColor3={new Color3(1, 1, 1)}
+					TextColor3={palette.Text}
 					TextTransparency={0.5}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					TextSize={18}
@@ -212,9 +212,9 @@ export default (props: CommonProps) => {
 					ZIndex={2}
 					ShowNativeInput={false}
 					TextStrokeTransparency={0}
-					TextStrokeColor3={Mocha.Base}
+					TextStrokeColor3={palette.Base}
 					TextWrapped={true}
-					TextColor3={new Color3(1, 1, 1)}
+					TextColor3={palette.Text}
 					forwardedRef={textBoxRef}
 					AutomaticSize={Enum.AutomaticSize.Y}
 					TextSize={18}

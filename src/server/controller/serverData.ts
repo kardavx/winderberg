@@ -11,12 +11,14 @@ import {
 	CreateProducer as createProfileProducer,
 	defaultState as defaultProfileState,
 	State as profileState,
+	replicationExceptions as profileReplicationExceptions,
 } from "shared/reflex/serverProfile";
 import {
 	defaultState as defaultServerState,
 	CreateProducer as createServerProducer,
 	saveExceptions as serverSaveExceptions,
 	State as serverProdState,
+	replicationExceptions as serverReplicationExceptions,
 } from "shared/reflex/serverState";
 import serverSignals from "shared/signal/serverSignals";
 import { ServerPlayerProfile, ServerState } from "shared/types/StateTypes";
@@ -134,6 +136,11 @@ const serverData: InitializerFunction = () => {
 							return dispatch(...args);
 						}
 
+						if (serverReplicationExceptions.find((value: string) => value === name)) {
+							print("Is an exception");
+							return dispatch(...args);
+						}
+
 						network.GetReplicatedState.fireAll({
 							name: name,
 							arguments: args,
@@ -187,6 +194,10 @@ const serverData: InitializerFunction = () => {
 								(...args: unknown[]) => {
 									if (profile.nextActionIsReplicated) {
 										profile.nextActionIsReplicated = false;
+										return dispatch(...args);
+									}
+
+									if (profileReplicationExceptions.find((value: string) => value === name)) {
 										return dispatch(...args);
 									}
 

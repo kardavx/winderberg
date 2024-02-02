@@ -1,8 +1,8 @@
 import Roact from "@rbxts/roact";
 import Bar from "./bar";
-import { Mocha } from "@rbxts/catppuccin";
 import LocalPlayer from "shared/util/LocalPlayer";
 import Maid from "@rbxts/maid";
+import palette from "shared/ui/palette/palette";
 
 interface Props {
 	Size: number;
@@ -40,7 +40,7 @@ export default (props: Props) => {
 			iconXOffset={0.2}
 			progress={health}
 			Size={UDim2.fromScale(props.Size, 1)}
-			BackgroundColor3={Mocha.Green}
+			BackgroundColor3={palette.Green}
 		/>
 	);
 };

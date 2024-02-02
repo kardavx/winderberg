@@ -7,13 +7,13 @@ import useSpring from "shared/ui/hook/useSpring";
 import clientSignals from "shared/signal/clientSignals";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
-import { Mocha } from "@rbxts/catppuccin";
 import interactionData, { defaultIcon, maxInteractionDistance } from "shared/data/interactionData";
 import Center from "../../base/Center";
 import Padding from "../../base/Padding";
 import Text from "../../base/Text";
 import LocalPlayer from "shared/util/LocalPlayer";
 import interactionModelMock from "./interactionModelMock";
+import palette from "shared/ui/palette/palette";
 
 export type AllowedInteractionInstances = BasePart | Model;
 
@@ -84,7 +84,7 @@ export default (props: CommonProps) => {
 					Text=""
 					AnchorPoint={new Vector2(0, 0.5)}
 					AutomaticSize={Enum.AutomaticSize.X}
-					BackgroundColor3={Mocha.Base}
+					BackgroundColor3={palette.Base}
 					Event={{
 						MouseButton1Click: () => {
 							subInteraction.functionality(interactingWith);
@@ -104,7 +104,7 @@ export default (props: CommonProps) => {
 					<imagelabel
 						Size={UDim2.fromScale(1, 1)}
 						BackgroundTransparency={1}
-						ImageColor3={Mocha.Text}
+						ImageColor3={palette.Text}
 						Image={subInteraction.icon !== undefined ? subInteraction.icon : defaultIcon}
 						ScaleType={Enum.ScaleType.Crop}
 					>
@@ -117,7 +117,7 @@ export default (props: CommonProps) => {
 						TextSize={25}
 						CustomTextScaled={true}
 						TextXAlignment={Enum.TextXAlignment.Left}
-						TextColor3={Mocha.Text}
+						TextColor3={palette.Text}
 						AutomaticSize={Enum.AutomaticSize.X}
 					/>
 				</textbutton>,
@@ -205,7 +205,7 @@ export default (props: CommonProps) => {
 				Size={UDim2.fromScale(0.06, 0.06)}
 				AnchorPoint={new Vector2(0.5, 0.5)}
 				ImageColor3={hoveringFactor.map((factor: number) => {
-					return Mocha.Text.Lerp(Mocha.Blue, factor);
+					return palette.Text.Lerp(palette.Blue, factor);
 				})}
 				ImageTransparency={shownFactor.map((factor: number) => {
 					return 1 - factor;

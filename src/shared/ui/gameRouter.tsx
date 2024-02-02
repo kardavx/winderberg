@@ -11,6 +11,7 @@ import HudRouter from "./components/complex/hud/hudRouter";
 import CurrentCamera from "shared/util/CurrentCamera";
 import clientSignals from "shared/signal/clientSignals";
 import Inventory from "./components/complex/inventory/inventory";
+import Menu from "./components/complex/menu/menu";
 
 export default (props: {
 	clientState: ClientProducer;

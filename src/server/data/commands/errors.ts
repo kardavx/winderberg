@@ -1,7 +1,7 @@
-import { Mocha } from "@rbxts/catppuccin";
+import palette from "shared/ui/palette/palette";
 
 export default {
-	errorColor: Mocha.Red,
+	errorColor: palette.Red,
 
 	notFound: (commandName: string) => `Komenda /${commandName} nie istnieje!`,
 	notPermitted: (commandName: string) => `Nie masz dostępu do komendy /${commandName}`,
