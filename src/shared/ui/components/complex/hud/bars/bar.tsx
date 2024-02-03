@@ -7,6 +7,7 @@ interface Props {
 	icon: string;
 	iconXOffset: number;
 	progress: number;
+	forwardedRef?: Roact.Ref<Frame>;
 	BackgroundColor3: Color3;
 	Size: UDim2;
 }
@@ -16,7 +17,7 @@ export default (props: Props) => {
 	setProgress(props.progress / 100);
 
 	return (
-		<frame Size={props.Size} BorderSizePixel={0} BackgroundColor3={palette.Base}>
+		<frame Size={props.Size} BorderSizePixel={0} BackgroundColor3={palette.Base} ref={props.forwardedRef}>
 			<Stroke Thickness={2} Color={palette.Text} />
 			<frame
 				BackgroundColor3={props.BackgroundColor3}

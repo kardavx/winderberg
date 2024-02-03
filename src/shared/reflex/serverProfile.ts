@@ -19,6 +19,8 @@ export interface State {
 	inventoryContainerId?: number;
 	externalContainerId?: number;
 
+	id?: number;
+
 	lastPlayerPosition?: SerializedVector3;
 	lastCharacterHealth?: number;
 }
@@ -38,6 +40,8 @@ export interface Actions {
 	secureOpenExternalContainer: (containerId: number) => void;
 	closeExternalContainer: () => void;
 
+	secureAssignId: (id: number) => void;
+
 	startTyping: () => void;
 	endTyping: () => void;
 }
@@ -55,7 +59,7 @@ export const defaultState: State = {
 	surname: surnames[math.random(0, names.size() - 1)],
 };
 
-export const saveExceptions: Partial<keyof State>[] = ["externalContainerId", "isTyping"];
+export const saveExceptions: Partial<keyof State>[] = ["externalContainerId", "isTyping", "id"];
 export const replicationExceptions: Partial<keyof Actions>[] = [
 	"secureSetLastPlayerPosition",
 	"secureSetLastCharacterHealth",
@@ -136,6 +140,12 @@ export const CreateProducer = (initialState: State) => {
 		endTyping: (oldState: State): State => {
 			const state = { ...oldState };
 			state.isTyping = false;
+
+			return state;
+		},
+		secureAssignId: (oldState: State, id: number): State => {
+			const state = { ...oldState };
+			state.id = id;
 
 			return state;
 		},

@@ -22,13 +22,7 @@ const disabledWeightValue = 0.001;
 const animate: CharacterInitializerFunction = (character: Character) => {
 	const maid = new Maid();
 
-	const [animations, animationCleanup] = loadAnimations(
-		animationList,
-		character.Humanoid.Animator,
-		(animationTrack) => {
-			animationTrack.Play(0, disabledWeightValue, 0);
-		},
-	);
+	const [animations, animationCleanup] = loadAnimations(animationList, character.Humanoid.Animator);
 
 	maid.GiveTask(
 		character.Humanoid.StateChanged.Connect(
@@ -64,6 +58,12 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 			},
 		),
 	);
+
+	animations.Idle.Play(0, disabledWeightValue, 0);
+	animations.WalkForward.Play(0, disabledWeightValue, 0);
+	animations.WalkRight.Play(0, disabledWeightValue, 0);
+	animations.WalkLeft.Play(0, disabledWeightValue, 0);
+
 	maid.GiveTask(animationCleanup);
 	maid.GiveTask(
 		clientSignals.onRender.Connect((deltaTime: number) => {

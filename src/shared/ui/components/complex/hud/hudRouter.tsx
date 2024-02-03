@@ -9,12 +9,13 @@ import Stamina from "./bars/stamina";
 import Hunger from "./bars/hunger";
 import Thirst from "./bars/thirst";
 import Chat from "./chat/chat";
-import useProducerAsState from "shared/ui/hook/useProducerAsState";
+import useProducerAsBinding from "shared/ui/hook/useProducerAsBinding";
 
 export default (props: CommonProps) => {
-	const [money] = useProducerAsState(props.serverProfile, (state) => state.money);
-	const [name] = useProducerAsState(props.serverProfile, (state) => state.name);
-	const [surname] = useProducerAsState(props.serverProfile, (state) => state.surname);
+	const [money] = useProducerAsBinding(props.serverProfile, (state) => state.money);
+	const [name] = useProducerAsBinding(props.serverProfile, (state) => state.name);
+	const [surname] = useProducerAsBinding(props.serverProfile, (state) => state.surname);
+	const [id] = useProducerAsBinding(props.serverProfile, (state) => state.id);
 
 	return (
 		<frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
@@ -76,7 +77,7 @@ export default (props: CommonProps) => {
 							CustomTextScaled={true}
 							AutomaticSize={Enum.AutomaticSize.X}
 							TextColor3={new Color3(1, 1, 1)}
-							Text={`${money}$`}
+							Text={money.map((amount: number) => `$${amount}`)}
 							TextSize={22}
 						/>
 					</frame>
@@ -103,7 +104,9 @@ export default (props: CommonProps) => {
 							TextColor3={new Color3(1, 1, 1)}
 							CustomTextScaled={true}
 							AutomaticSize={Enum.AutomaticSize.X}
-							Text={`${name} ${surname}`}
+							Text={Roact.joinBindings({ name, surname, id }).map(({ name, surname, id }) => {
+								return `${name} ${surname} (${id !== undefined ? id : "BRAK"})`;
+							})}
 							TextSize={22}
 						/>
 					</frame>
