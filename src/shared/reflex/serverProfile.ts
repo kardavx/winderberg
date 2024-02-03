@@ -14,6 +14,8 @@ export interface State {
 	name?: string;
 	surname?: string;
 
+	isTyping: boolean;
+
 	inventoryContainerId?: number;
 	externalContainerId?: number;
 
@@ -35,11 +37,16 @@ export interface Actions {
 
 	secureOpenExternalContainer: (containerId: number) => void;
 	closeExternalContainer: () => void;
+
+	startTyping: () => void;
+	endTyping: () => void;
 }
 
 export const defaultState: State = {
 	money: 1337,
 	bank: 1000,
+
+	isTyping: false,
 
 	hunger: 100,
 	thirst: 100,
@@ -48,7 +55,7 @@ export const defaultState: State = {
 	surname: surnames[math.random(0, names.size() - 1)],
 };
 
-export const saveExceptions: Partial<keyof State>[] = ["externalContainerId"];
+export const saveExceptions: Partial<keyof State>[] = ["externalContainerId", "isTyping"];
 export const replicationExceptions: Partial<keyof Actions>[] = [
 	"secureSetLastPlayerPosition",
 	"secureSetLastCharacterHealth",
@@ -117,6 +124,18 @@ export const CreateProducer = (initialState: State) => {
 			state.lastCharacterHealth = health;
 
 			print(health);
+
+			return state;
+		},
+		startTyping: (oldState: State): State => {
+			const state = { ...oldState };
+			state.isTyping = true;
+
+			return state;
+		},
+		endTyping: (oldState: State): State => {
+			const state = { ...oldState };
+			state.isTyping = false;
 
 			return state;
 		},

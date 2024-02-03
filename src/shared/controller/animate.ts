@@ -3,19 +3,17 @@ import clientSignals from "shared/signal/clientSignals";
 import loadAnimations from "shared/util/loadAnimations";
 
 const animationList = {
-	Idle: 16162737790,
-	WalkForward: 16162741819,
-	WalkBackward: 16162741819,
-	WalkRight: 16162743675,
-	WalkLeft: 16162748371,
-	Jump: 16189394192,
-	Fall: 16189391286,
-	Climb: 16189425645,
-	Landed: 16189401060,
-	Seat: 16194757925,
-	Run: 16214766463,
-	DriverSeat: 16194759720,
-	PassengerSeat: 16194761482,
+	Idle: 16223351246,
+	WalkForward: 16223347742,
+	WalkRight: 16223343231,
+	WalkLeft: 16223338653,
+	Jump: 16223329648,
+	Fall: 16223333788,
+	Climb: 16223318147,
+	Landed: 16223321462,
+	Seat: 16223314578,
+	DriverSeat: 16223310341,
+	PassengerSeat: 16223305076,
 };
 
 const fadeTime = 0.2;
@@ -117,7 +115,6 @@ const animate: CharacterInitializerFunction = (character: Character) => {
 					animations.Idle.AdjustWeight(disabledWeightValue, fadeTime);
 				}
 			} else {
-				animations.Run.AdjustWeight(disabledWeightValue, fadeTime);
 				animations.WalkForward.AdjustWeight(disabledWeightValue, fadeTime);
 				animations.WalkRight.AdjustWeight(disabledWeightValue, fadeTime);
 				animations.WalkLeft.AdjustWeight(disabledWeightValue, fadeTime);

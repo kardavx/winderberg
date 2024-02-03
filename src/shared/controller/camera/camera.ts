@@ -101,77 +101,67 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 		),
 	);
 
-	maid.GiveTask(
-		gameSignals.onRender.Connect((deltaTime: number) => {
-			const ignored: Instance[] = [];
-			ignoredRaycastTags.forEach((tag: string) => {
-				CollectionService.GetTagged(tag).forEach((tagged) => {
-					ignored.push(tagged);
-				});
+	RunService.BindToRenderStep("camUpdate", Enum.RenderPriority.Camera.Value, (deltaTime: number) => {
+		const ignored: Instance[] = [];
+		ignoredRaycastTags.forEach((tag: string) => {
+			CollectionService.GetTagged(tag).forEach((tagged) => {
+				ignored.push(tagged);
 			});
+		});
 
-			cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera, ...ignored];
+		cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera, ...ignored];
 
-			const currentState = clientProducer.getState();
-
-			const isMouseUnlocked = currentState.mouseEnablers.size() > 0;
-			const isCameraLocked =
-				character.Humanoid.GetState() !== Enum.HumanoidStateType.Seated &&
-				character.Humanoid.GetState() !== Enum.HumanoidStateType.Climbing &&
-				currentState.lockEnablers.size() > 0;
-
-			UserInputService.MouseIconEnabled = isMouseUnlocked;
-
-			if (CurrentCamera.CameraType !== Enum.CameraType.Scriptable) {
-				CurrentCamera.CameraType = Enum.CameraType.Scriptable;
-			}
-
-			if (UserInputService.MouseBehavior !== mouseUnlockedToBehavior(isMouseUnlocked)) {
-				UserInputService.MouseBehavior = mouseUnlockedToBehavior(isMouseUnlocked);
-			}
-
-			const cameraSubject = character.HumanoidRootPart.Position;
-			const baseCFrame = new CFrame(cameraSubject).mul(
-				CFrame.fromEulerAnglesYXZ(math.rad(orientation.Y), math.rad(orientation.X), 0),
-			);
-
-			if (isCameraLocked) {
-				character.Humanoid.AutoRotate = false;
-				moveDirection = roundVector(
-					unnanifyVector(
-						new CFrame(cameraSubject)
-							.mul(CFrame.Angles(0, math.rad(orientation.X), 0))
-							.VectorToObjectSpace(character.Humanoid.MoveDirection).Unit,
-					),
-				);
-			} else {
-				character.Humanoid.AutoRotate = true;
-				moveDirection = new Vector3(0, 0, -math.sign(character.Humanoid.MoveDirection.Magnitude));
-			}
-
-			const offsetedCFrame = baseCFrame.mul(desiredOffset);
-			const cframeWithModifiers = offsetedCFrame.mul(cameraModifier.getOffsets());
-
-			currentZOffset = getActualZOffset(
-				cframeWithModifiers.mul(new CFrame(0, -desiredOffset.Position.Y, 0)),
-				cameraObstructionParams,
-				zOffset * cameraConfig.zOffsetMultipliers[zOffsetMultiplierIndex],
-				currentZOffset,
-				deltaTime,
-			);
-			const ZoffsetedCFrame = cframeWithModifiers.mul(new CFrame(0, 0, currentZOffset));
-
-			CurrentCamera.CFrame = ZoffsetedCFrame;
-			CurrentCamera.Focus = ZoffsetedCFrame;
-		}),
-	);
-
-	RunService.BindToRenderStep("UpdateAfterCharacter", Enum.RenderPriority.Character.Value + 1, () => {
 		const currentState = clientProducer.getState();
+
+		const isMouseUnlocked = currentState.mouseEnablers.size() > 0;
 		const isCameraLocked =
 			character.Humanoid.GetState() !== Enum.HumanoidStateType.Seated &&
 			character.Humanoid.GetState() !== Enum.HumanoidStateType.Climbing &&
 			currentState.lockEnablers.size() > 0;
+
+		UserInputService.MouseIconEnabled = isMouseUnlocked;
+
+		if (CurrentCamera.CameraType !== Enum.CameraType.Scriptable) {
+			CurrentCamera.CameraType = Enum.CameraType.Scriptable;
+		}
+
+		if (UserInputService.MouseBehavior !== mouseUnlockedToBehavior(isMouseUnlocked)) {
+			UserInputService.MouseBehavior = mouseUnlockedToBehavior(isMouseUnlocked);
+		}
+
+		const cameraSubject = character.HumanoidRootPart.Position;
+		const baseCFrame = new CFrame(cameraSubject).mul(
+			CFrame.fromEulerAnglesYXZ(math.rad(orientation.Y), math.rad(orientation.X), 0),
+		);
+
+		if (isCameraLocked) {
+			character.Humanoid.AutoRotate = false;
+			moveDirection = roundVector(
+				unnanifyVector(
+					new CFrame(cameraSubject)
+						.mul(CFrame.Angles(0, math.rad(orientation.X), 0))
+						.VectorToObjectSpace(character.Humanoid.MoveDirection).Unit,
+				),
+			);
+		} else {
+			character.Humanoid.AutoRotate = true;
+			moveDirection = new Vector3(0, 0, -math.sign(character.Humanoid.MoveDirection.Magnitude));
+		}
+
+		const offsetedCFrame = baseCFrame.mul(desiredOffset);
+		const cframeWithModifiers = offsetedCFrame.mul(cameraModifier.getOffsets());
+
+		currentZOffset = getActualZOffset(
+			cframeWithModifiers.mul(new CFrame(0, -desiredOffset.Position.Y, 0)),
+			cameraObstructionParams,
+			zOffset * cameraConfig.zOffsetMultipliers[zOffsetMultiplierIndex],
+			currentZOffset,
+			deltaTime,
+		);
+		const ZoffsetedCFrame = cframeWithModifiers.mul(new CFrame(0, 0, currentZOffset));
+
+		CurrentCamera.CFrame = ZoffsetedCFrame;
+		CurrentCamera.Focus = ZoffsetedCFrame;
 
 		if (isCameraLocked) {
 			character.PrimaryPart.CFrame = new CFrame(character.PrimaryPart.Position).mul(
@@ -179,7 +169,6 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 			);
 		}
 	});
-
 	maid.GiveTask(() => RunService.UnbindFromRenderStep("UpdateAfterCharacter"));
 
 	maid.GiveTask(

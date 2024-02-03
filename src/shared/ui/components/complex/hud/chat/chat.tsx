@@ -131,6 +131,13 @@ export default (props: CommonProps) => {
 					textBoxRef.current.Text = messageHistory[newHistoryIndex];
 				}, Enum.KeyCode.Down),
 			);
+
+			if (textBoxRef.current.IsFocused()) {
+				props.serverProfile.startTyping();
+			}
+
+			maid.GiveTask(textBoxRef.current.Focused.Connect(() => props.serverProfile.startTyping()));
+			maid.GiveTask(textBoxRef.current.FocusLost.Connect(() => props.serverProfile.endTyping()));
 		}
 
 		maid.GiveTask(
