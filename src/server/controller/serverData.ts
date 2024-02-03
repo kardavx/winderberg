@@ -98,8 +98,6 @@ const getDataToSave = <scopedState>(
 };
 
 const serverData: InitializerFunction = () => {
-	print("running serverData");
-
 	const maid = new Maid();
 	serverState = undefined;
 	playerProfiles = {};
@@ -137,7 +135,6 @@ const serverData: InitializerFunction = () => {
 						}
 
 						if (serverReplicationExceptions.find((value: string) => value === name)) {
-							print("Is an exception");
 							return dispatch(...args);
 						}
 
@@ -240,14 +237,12 @@ const serverData: InitializerFunction = () => {
 			return;
 		}
 
-		print(profile.producer.getState());
 		return profile.producer.getState();
 	});
 
 	network.GetServerData.onRequest((player: Player) => {
 		if (serverState === undefined) return;
 
-		print(serverState.producer.getState());
 		return serverState.producer.getState();
 	});
 

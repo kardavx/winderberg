@@ -90,8 +90,6 @@ export const CreateProducer = (initialState: State) => {
 			return state;
 		},
 		pushNotification: (oldState: State, notification: Notification): State => {
-			print("pushing notification");
-
 			const state = { ...oldState };
 			state.notifications = [...state.notifications];
 			state.notifications.push({ ...notification, ...{ pushTick: tick() } });

@@ -27,12 +27,8 @@ const playerBinder: InitializerFunction = () => {
 			characterMaids[player.Name] = new Maid();
 			characterMaids[player.Name].GiveTask(
 				actualCharacter.Humanoid.GetPropertyChangedSignal("Health").Connect(() => {
-					print("essa");
-
 					const playerProfile = getPlayerProfile(player);
 					if (!playerProfile) return;
-
-					print("essa");
 
 					if (actualCharacter.Humanoid.Health === 0) {
 						playerProfile.producer.secureSetLastCharacterHealth(undefined);
