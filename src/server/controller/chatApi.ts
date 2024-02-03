@@ -5,12 +5,14 @@ import errors from "server/data/commands/errors";
 import ranges from "server/data/commands/ranges";
 import wasMessageFiltered from "server/util/wasMessageFiltered";
 import network from "shared/network/network";
+import serverSignals from "shared/signal/serverSignals";
 import attachRichTextColor from "shared/util/attachRichTextColor";
 import clampedInverseLerp from "shared/util/clampedInverseLerp";
 import getPlayersInRange from "shared/util/getPlayersInRange";
 import hasPrefix from "shared/util/hasPrefix";
 
 type CommmandCheckResult = "Command" | "CommandNotFound";
+export type ValidateMessage = typeof validateMessage;
 
 const checkForCommand = (message: string): LuaTuple<[CommmandCheckResult, string?, string[]?]> => {
 	if (!hasPrefix(message)) return $tuple("Command", "say", message.split(" "));
@@ -23,6 +25,9 @@ const checkForCommand = (message: string): LuaTuple<[CommmandCheckResult, string
 
 	return $tuple("Command", commandName, splitMessage);
 };
+
+export const getServerDoText = (message: string) =>
+	attachRichTextColor(`** ( ${message} )`, commands.do.color || new Color3(1, 1, 1));
 
 const getColor = (
 	color: Color3 = new Color3(1, 1, 1),
@@ -42,7 +47,9 @@ const getColor = (
 	return color;
 };
 
-const validateMessage = (sender: Player, message: string): boolean => {
+const validateMessage = (sender: Player, message: string, firedByServer: boolean): boolean => {
+	if (firedByServer) return true;
+
 	const [filtered, filteredMessage] = wasMessageFiltered(message, sender.UserId);
 
 	if (filtered) {
@@ -56,46 +63,61 @@ const validateMessage = (sender: Player, message: string): boolean => {
 	return true;
 };
 
+const sendMessage = (player: Player, message: string, firedByServer: boolean) => {
+	if (!player.Character) return;
+	const [commandCheckResult, commandName, commandParams] = checkForCommand(message);
+
+	if (commandCheckResult === "CommandNotFound") {
+		network.ReceiveChatMessage.fire(
+			player,
+			attachRichTextColor(errors.notFound(commandName as string), errors.errorColor),
+		);
+	}
+
+	if (commandCheckResult === "Command") {
+		const commandData = commands[commandName as CommandsUnion];
+
+		if (commandData.minRank !== undefined) {
+			if (player.GetRankInGroup(0) < commandData.minRank) {
+				network.ReceiveChatMessage.fire(
+					player,
+					attachRichTextColor(errors.notFound(commandName as string), errors.errorColor),
+				);
+				return;
+			}
+		}
+
+		const commandResult = commandData.functionality(
+			player,
+			validateMessage,
+			firedByServer,
+			commandParams as string[],
+		);
+		if (commandResult !== undefined) {
+			const range = commandData.range !== undefined ? commandData.range : ranges.Normal;
+			const fullColorRange = range - range / 3;
+			const playersInRange = getPlayersInRange(player.Character.GetPivot().Position, range);
+
+			playersInRange.forEach(({ player, distance }) => {
+				const messageColor = getColor(commandData.color, commandData.darkens, distance, fullColorRange);
+				network.ReceiveChatMessage.fire(player, attachRichTextColor(commandResult, messageColor));
+			});
+		}
+	}
+};
+
 const chatApi: InitializerFunction = () => {
 	const maid = new Maid();
 
 	maid.GiveTask(
 		network.SendChatMessage.connect((player: Player, message: string) => {
-			if (!player.Character) return;
-			const [commandCheckResult, commandName, commandParams] = checkForCommand(message);
+			sendMessage(player, message, false);
+		}),
+	);
 
-			if (commandCheckResult === "CommandNotFound") {
-				network.ReceiveChatMessage.fire(
-					player,
-					attachRichTextColor(errors.notFound(commandName as string), errors.errorColor),
-				);
-			}
-
-			if (commandCheckResult === "Command") {
-				const commandData = commands[commandName as CommandsUnion];
-
-				if (commandData.minRank !== undefined) {
-					if (player.GetRankInGroup(0) < commandData.minRank) {
-						network.ReceiveChatMessage.fire(
-							player,
-							attachRichTextColor(errors.notFound(commandName as string), errors.errorColor),
-						);
-						return;
-					}
-				}
-
-				const commandResult = commandData.functionality(player, validateMessage, commandParams as string[]);
-				if (commandResult !== undefined) {
-					const range = commandData.range !== undefined ? commandData.range : ranges.Normal;
-					const fullColorRange = range - range / 3;
-					const playersInRange = getPlayersInRange(player.Character.GetPivot().Position, range);
-
-					playersInRange.forEach(({ player, distance }) => {
-						const messageColor = getColor(commandData.color, commandData.darkens, distance, fullColorRange);
-						network.ReceiveChatMessage.fire(player, attachRichTextColor(commandResult, messageColor));
-					});
-				}
-			}
+	maid.GiveTask(
+		serverSignals.mockPlayerMessage.Connect((mockedPlayer: Player, message: string) => {
+			sendMessage(mockedPlayer, message, true);
 		}),
 	);
 

@@ -2,31 +2,47 @@ import { clientProducer } from "shared/controller/clientPlayerData";
 import { icons } from "./notificationData";
 import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
 import LocalPlayer from "shared/util/LocalPlayer";
+import isInteractionLocked from "shared/util/interaction/isInteractionLocked";
 
-interface SubInteraction {
-	name: string;
+export interface SubInteraction {
+	name: string | ((adornee: AllowedInteractionInstances) => string);
 	icon?: string;
 	serverActionId?: string;
 	validator?: (adornee: AllowedInteractionInstances) => boolean;
 	functionality?: (adornee: AllowedInteractionInstances) => void;
 }
 
-interface Interactions {
+export interface Interactions {
 	[interactionType: string]: SubInteraction[];
 }
+
+const notLockedValidator = (adornee: AllowedInteractionInstances) => {
+	if (isInteractionLocked(adornee) === true) {
+		return false;
+	}
+
+	return true;
+};
+
+const lockedText = (lockedText: string, unlockedText: string) => (adornee: AllowedInteractionInstances) => {
+	if (isInteractionLocked(adornee) === true) {
+		return lockedText;
+	}
+
+	return unlockedText;
+};
 
 const carInteractions: SubInteraction[] = [
 	{
 		name: "Otwórz",
+		validator: notLockedValidator,
 		functionality: () => {
 			print("otwiraj");
 		},
 	},
 	{
-		name: "Zaklucz",
-		functionality: () => {
-			print("zakluczaj to");
-		},
+		name: lockedText("Odklucz", "Zaklucz"),
+		serverActionId: "Lock",
 	},
 ];
 
@@ -82,20 +98,17 @@ const interactionData: Interactions = {
 	Player: [
 		{
 			name: "Pokaż ID",
-			functionality: () => {
-				print("pokazuje");
-			},
+			serverActionId: "showID",
 		},
 		{
 			name: "Pokaż licencje kierowcy",
-			functionality: () => {
-				print("pokazuje");
-			},
+			serverActionId: "showDL",
 		},
 	],
 	CarDoor: [
 		{
 			name: "Wsiądź",
+			validator: notLockedValidator,
 			functionality: (doorModel) => {
 				const model = doorModel as Model;
 				const value = model.FindFirstChild("To") as ObjectValue;
@@ -110,6 +123,7 @@ const interactionData: Interactions = {
 	CarTrunk: [
 		{
 			name: "Przeszukaj",
+			validator: notLockedValidator,
 			serverActionId: "Search",
 		},
 		...carInteractions,

@@ -10,8 +10,6 @@ const onStorageAdded = (storage: Instance) => {
 
 	if (storageId === undefined || storageWeight === undefined) return;
 
-	print("storage added");
-
 	waitForServerState().andThen((serverState) => {
 		const producerState = serverState.producer.getState();
 		if (producerState.storageContainerIds[storageId] !== undefined) {

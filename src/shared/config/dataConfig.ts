@@ -1,4 +1,4 @@
-const versionPrefix = `75`;
+const versionPrefix = `76`;
 
 export default {
 	serverStateKey: `wynderberg_data_${versionPrefix}`,

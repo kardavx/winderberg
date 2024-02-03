@@ -187,7 +187,6 @@ const clientPlayerData: InitializerFunction = () => {
 
 	maid.GiveTask(
 		network.GetReplicatedProfile.connect((data) => {
-			print("on profile repliation");
 			if (!isPlayerDataLoaded) {
 				warn("Queued profile action before player data loaded");
 				gameSignals.playerDataLoaded.Wait();
@@ -209,7 +208,6 @@ const clientPlayerData: InitializerFunction = () => {
 
 	maid.GiveTask(
 		network.GetReplicatedState.connect((data) => {
-			print(`[STATE REPLICATION] ${data.name} with arguments`, data.arguments);
 			if (!isServerDataLoaded) {
 				warn("Queued store action before server data loaded");
 				return;

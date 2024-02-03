@@ -59,6 +59,12 @@ export default (props: CommonProps) => {
 		[Roact.Element[], Roact.Dispatch<Roact.SetStateAction<Roact.Element[]>>]
 	>;
 
+	const [validatedSubInteractions, setValidatedSubInteractions] = Roact.useBinding(
+		{} as { [index: number]: boolean },
+	);
+
+	const [subInteractionNames, setSubInteractionNames] = Roact.useBinding({} as { [index: number]: string });
+
 	const [shownFactor, setShownFactor] = useSpring({ initialValue: 0, stiffness: 70, dampening: 20 });
 	const [hoveringFactor, setHoveringFactor] = useSpring({ initialValue: 0, stiffness: 120, dampening: 20 });
 	const [interactingWithFactor, setInteractingWithFactor] = useSpring({
@@ -76,13 +82,17 @@ export default (props: CommonProps) => {
 
 	if (interactingWith && interactingWith !== lastInteractingWith.getValue()) {
 		const newRenderedSubInteractions: Roact.Element[] = [];
-		const subInteractionsData = interactionData[interactingWith.GetAttribute("interactionType") as string];
+		const subInteractions = interactionData[interactingWith.GetAttribute("interactionType") as string];
 
-		subInteractionsData.forEach((subInteraction) => {
+		subInteractions.forEach((subInteraction, index) => {
 			newRenderedSubInteractions.push(
 				<textbutton
 					Size={UDim2.fromScale(1, 1)}
 					Text=""
+					LayoutOrder={index}
+					Visible={validatedSubInteractions.map((validatedInteractions) => {
+						return validatedInteractions[index];
+					})}
 					AnchorPoint={new Vector2(0, 0.5)}
 					AutomaticSize={Enum.AutomaticSize.X}
 					BackgroundColor3={palette.Base}
@@ -118,7 +128,7 @@ export default (props: CommonProps) => {
 					</imagelabel>
 
 					<Text
-						Text={subInteraction.name}
+						Text={subInteractionNames.map((names) => names[index])}
 						Size={UDim2.fromScale(0.8, 1)}
 						TextSize={25}
 						CustomTextScaled={true}
@@ -192,6 +202,31 @@ export default (props: CommonProps) => {
 				const currentlyFocusedInteraction = getFocusedInteraction();
 				if (currentlyFocusedInteraction !== undefined) {
 					setHoveringFactor(1);
+					if (currentlyFocusedInteraction === interactingWith) {
+						const currentSubInteractions =
+							interactionData[interactingWith.GetAttribute("interactionType") as string];
+
+						// validate subinteractions
+						const newValidatedSubInteractions: { [index: number]: boolean } = {};
+						const newSubInteractionNames: { [index: number]: string } = {};
+
+						currentSubInteractions.forEach((subInteraction, index) => {
+							newValidatedSubInteractions[index] =
+								subInteraction.validator === undefined ||
+								subInteraction.validator(interactingWith) === true
+									? true
+									: false;
+							newSubInteractionNames[index] =
+								typeOf(subInteraction.name) === "function"
+									? (subInteraction.name as (adornee: AllowedInteractionInstances) => string)(
+											interactingWith,
+										)
+									: (subInteraction.name as string);
+						});
+
+						setValidatedSubInteractions(newValidatedSubInteractions);
+						setSubInteractionNames(newSubInteractionNames);
+					}
 				} else {
 					setHoveringFactor(0);
 					if (interactingWith) setInteractingWith(undefined);
@@ -213,6 +248,7 @@ export default (props: CommonProps) => {
 				ImageColor3={hoveringFactor.map((factor: number) => {
 					return palette.Text.Lerp(palette.Blue, factor);
 				})}
+				Visible={shownFactor.map((factor) => factor > 0.01)}
 				ImageTransparency={shownFactor.map((factor: number) => {
 					return 1 - factor;
 				})}
@@ -227,6 +263,7 @@ export default (props: CommonProps) => {
 				BackgroundTransparency={1}
 				GroupTransparency={interactingWithFactor.map((factor: number) => 1 - factor)}
 				AnchorPoint={new Vector2(0.5, 0.5)}
+				Visible={interactingWithFactor.map((factor) => factor > 0.01)}
 				Position={interactingWithFactor.map((factor: number) => {
 					return UDim2.fromScale(0.575, 0.5).Lerp(UDim2.fromScale(0.585, 0.5), factor);
 				})}

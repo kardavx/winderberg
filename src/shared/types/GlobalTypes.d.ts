@@ -12,7 +12,8 @@ interface CommandServerData {
 	range?: number;
 	functionality: (
 		sender: Player,
-		validate: (sender: Player, message: string) => boolean,
+		validate: (sender: Player, message: string, firedByServer: boolean) => boolean,
+		firedByServer: boolean,
 		message: string[],
 	) => string | undefined;
 }
