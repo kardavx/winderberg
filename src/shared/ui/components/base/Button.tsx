@@ -3,9 +3,10 @@ import getViewportScaledNumber from "shared/ui/util/getViewportScaledNumber";
 import Stroke from "./Stroke";
 import palette from "shared/ui/palette/palette";
 
-interface Props extends Roact.JsxInstanceProperties<TextLabel>, Roact.PropsWithChildren {
+interface Props extends Roact.JsxInstanceProperties<TextButton>, Roact.PropsWithChildren {
 	TextSize?: number;
 	TextScaled?: boolean;
+	Callback: () => void;
 	CustomTextScaled?: boolean;
 	Stroke?: number;
 	Weight?: "Regular" | "Bold";
@@ -23,22 +24,32 @@ export default (props: Props) => {
 	const resolution = {
 		...(props.CustomTextScaled && { TextScaled: false, TextSize: getViewportScaledNumber(textSize) }),
 	};
-	const properties = { ...props, Weight: undefined, CustomTextScaled: undefined, Stroke: undefined };
+	const properties = {
+		...props,
+		Weight: undefined,
+		CustomTextScaled: undefined,
+		Stroke: undefined,
+		Callback: undefined,
+	};
 	const weight = props.Weight !== undefined ? props.Weight : "Regular";
 
 	return (
-		<textlabel
+		<textbutton
 			TextScaled={true}
 			RichText={true}
+			AutoButtonColor={false}
 			TextColor3={palette.Text}
-			BackgroundTransparency={1}
+			BackgroundColor3={palette.Base}
 			Font={weightToFont[weight]}
 			{...properties}
 			{...resolution}
+			Event={{
+				MouseButton1Click: () => props.Callback(),
+			}}
 		>
 			<uitextsizeconstraint MaxTextSize={props.TextSize} />
 			<Stroke Thickness={strokeSize} Color={new Color3(0, 0, 0)} />
 			{props.children}
-		</textlabel>
+		</textbutton>
 	);
 };

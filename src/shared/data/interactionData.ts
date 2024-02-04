@@ -1,5 +1,4 @@
-import { clientProducer } from "shared/controller/clientPlayerData";
-import { icons } from "./notificationData";
+import { getServerProfile } from "shared/controller/clientPlayerData";
 import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
 import LocalPlayer from "shared/util/LocalPlayer";
 import isInteractionLocked from "shared/util/interaction/isInteractionLocked";
@@ -46,53 +45,48 @@ const carInteractions: SubInteraction[] = [
 	},
 ];
 
+const sharedBankInteractions: SubInteraction[] = [
+	{
+		name: "Zarządzaj kontem",
+		serverActionId: "ManageAccount",
+		validator: (adornee: AllowedInteractionInstances) => {
+			const serverProfile = getServerProfile();
+			if (!serverProfile) return false;
+
+			if (serverProfile.getState().bankAccountNumber === undefined) return false;
+
+			return true;
+		},
+	},
+];
+
 const interactionData: Interactions = {
-	ATM: [
+	ATM: [...sharedBankInteractions],
+	BankClerk: [
+		...sharedBankInteractions,
 		{
-			name: "Wypłać",
-			icon: icons.money,
-			functionality: () => {
-				clientProducer.pushNotification({
-					title: "Bank",
-					description: `Wypłaciłes 100$ z konta`,
-					icon: "money",
-				});
+			name: "Załóż konto",
+			validator: (adornee: AllowedInteractionInstances) => {
+				const serverProfile = getServerProfile();
+				if (!serverProfile) return false;
+
+				if (serverProfile.getState().bankAccountNumber !== undefined) return false;
+
+				return true;
 			},
+			serverActionId: "CreateAccount",
 		},
 		{
-			name: "Wpłać",
-			icon: icons.money,
-			functionality: () => {
-				clientProducer.pushNotification({
-					title: "Bank",
-					description: `Wpłaciłes 100$ na konto`,
-					icon: "money",
-				});
+			name: "Deaktywuj konto",
+			validator: (adornee: AllowedInteractionInstances) => {
+				const serverProfile = getServerProfile();
+				if (!serverProfile) return false;
+
+				if (serverProfile.getState().bankAccountNumber === undefined) return false;
+
+				return true;
 			},
-		},
-		{
-			name: "Okradnij",
-			icon: icons.crime,
-			functionality: () => {
-				clientProducer.pushNotification({
-					title: "rabunek",
-					description: `Obrabowałeś bankomat pomyślnie, otrzymujesz 430$`,
-					icon: "crime",
-				});
-			},
-		},
-	],
-	Car: [
-		{
-			name: "Ukradnij",
-			icon: icons.crime,
-			functionality: () => {
-				clientProducer.pushNotification({
-					title: "Rabunek",
-					description: `Zostaw to auto zlodzieju!!!`,
-					icon: "crime",
-				});
-			},
+			serverActionId: "DeactivateAccount",
 		},
 	],
 	Player: [

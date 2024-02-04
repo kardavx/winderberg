@@ -1,7 +1,8 @@
 import Maid from "@rbxts/maid";
 import { Players, Workspace } from "@rbxts/services";
 import { getServerDoText } from "server/controller/chatApi";
-import { getPlayerProfile } from "server/controller/serverData";
+import { getPlayerProfile, getServerState } from "server/controller/serverData";
+import { createAccount } from "server/module/banking";
 import getPlayerNameAndSurname from "server/util/getPlayerNameAndSurname";
 import network from "shared/network/network";
 import serverSignals from "shared/signal/serverSignals";
@@ -121,7 +122,7 @@ const manageAccount = (accountNumber: string, player: Player, adornee: AllowedIn
 	distanceBasedInteraction(
 		player,
 		adornee,
-		5,
+		10,
 		() => playerProfile.producer.stopUsingBankAccount(),
 		(cleanup) =>
 			playerProfile.producer.subscribe(
@@ -148,8 +149,12 @@ export const serverInteractionData: Interactions = {
 			const playerProfile = getPlayerProfile(player);
 			if (!playerProfile) return;
 
+			print("profile is here");
+
 			const profileState = playerProfile.producer.getState();
 			if (profileState.bankAccountNumber === undefined) return;
+
+			print("bankAccountNumber is here");
 
 			manageAccount(profileState.bankAccountNumber, player, adornee);
 		},
@@ -159,8 +164,12 @@ export const serverInteractionData: Interactions = {
 			const playerProfile = getPlayerProfile(player);
 			if (!playerProfile) return;
 
+			print("profile is here");
+
 			const profileState = playerProfile.producer.getState();
 			if (profileState.bankAccountNumber === undefined) return;
+
+			print("bankAccountNumber is here");
 
 			manageAccount(profileState.bankAccountNumber, player, adornee);
 		},
@@ -170,13 +179,22 @@ export const serverInteractionData: Interactions = {
 
 			const profileState = playerProfile.producer.getState();
 			if (profileState.bankAccountNumber !== undefined) return;
+
+			const accountNumber = createAccount();
+			playerProfile.producer.secureAssignBankAccountNumber(accountNumber);
 		},
 		DeactivateAccount: (player: Player, adornee: AllowedInteractionInstances) => {
 			const playerProfile = getPlayerProfile(player);
 			if (!playerProfile) return;
 
+			const serverState = getServerState();
+			if (!serverState) return;
+
 			const profileState = playerProfile.producer.getState();
 			if (profileState.bankAccountNumber === undefined) return;
+
+			serverState.producer.secureDeactivateBankAccount(profileState.bankAccountNumber);
+			playerProfile.producer.secureUnassignBankAccountNumber();
 		},
 	},
 };

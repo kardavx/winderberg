@@ -53,6 +53,8 @@ export const getPlayerProfile = (player: Player): ServerPlayerProfile | undefine
 	return playerProfiles[player.Name];
 };
 
+export const getServerState = () => serverState
+
 export const waitForPlayerProfile = (player: Player): Promise<ServerPlayerProfile> => {
 	return new Promise((resolve) => {
 		if (playerProfiles[player.Name]) {

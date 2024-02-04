@@ -20,6 +20,10 @@ export default Remo.createRemotes({
 		t.interface({ name: t.string, arguments: t.array(t.any) }),
 	),
 
+	Withdraw: remote<Server, [number]>(t.number),
+	Deposit: remote<Server, [number]>(t.number),
+	Transfer: remote<Server, [string, number]>(t.string, t.number),
+
 	SendChatMessage: remote<Server, [string]>(t.string).middleware(throttleMiddleware(0.1)),
 	ReceiveChatMessage: remote<Client, [string]>(t.string),
 

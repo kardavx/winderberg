@@ -16,14 +16,14 @@ interface Props extends CommonProps {
 }
 
 export default (props: Props) => {
-	const [containers] = useProducerAsState(props.serverState, (state) => state.containers);
+	const [container] = useProducerAsState(props.serverState, (state) => state.containers[props.containerId]);
 
 	let weight = `0/0kg`;
 	const renderedItems: Roact.Element[] = [];
 
-	if (containers[props.containerId]) {
-		weight = `${getItemsWeight(containers[props.containerId].content)}/${containers[props.containerId].maxWeight}kg`;
-		containers[props.containerId].content.forEach((item, index) => {
+	if (container) {
+		weight = `${getItemsWeight(container.content)}/${container.maxWeight}kg`;
+		container.content.forEach((item, index) => {
 			renderedItems.push(
 				<frame
 					Size={new UDim2(1, 0, 0, getViewportScaledNumber(90))}
@@ -124,13 +124,7 @@ export default (props: Props) => {
 					Size={UDim2.fromScale(0.8, 1)}
 					Weight="Bold"
 					TextXAlignment={Enum.TextXAlignment.Left}
-					Text={
-						props.isExternal
-							? containers[props.containerId]
-								? containers[props.containerId].name
-								: "External"
-							: "Inventory"
-					}
+					Text={props.isExternal ? (container ? container.name : "External") : "Inventory"}
 					TextColor3={palette.Text}
 				/>
 				<Text

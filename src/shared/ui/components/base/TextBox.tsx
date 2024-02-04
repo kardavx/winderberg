@@ -1,10 +1,11 @@
 import Roact from "@rbxts/roact";
 import getViewportScaledNumber from "shared/ui/util/getViewportScaledNumber";
 import { weightToFont } from "./Text";
+import palette from "shared/ui/palette/palette";
 
 interface Props extends Roact.JsxInstanceProperties<TextBox>, Roact.PropsWithChildren {
 	FocusChanged?: (focused: boolean, enterPressed: boolean) => void;
-	TextChanged?: (text: string) => void;
+	TextChanged?: (text: string, textBox: TextBox) => void;
 	CustomTextScaled?: boolean;
 	forwardedRef?: Roact.Ref<TextBox>;
 	Weight?: "Regular" | "Bold";
@@ -29,6 +30,7 @@ export default (props: Props) => {
 		<textbox
 			TextScaled={true}
 			RichText={true}
+			TextColor3={palette.Text}
 			Font={weightToFont[weight]}
 			ref={props.forwardedRef}
 			{...properties}
@@ -43,7 +45,7 @@ export default (props: Props) => {
 			}}
 			Change={{
 				Text: (textBox: TextBox) => {
-					if (props.TextChanged) props.TextChanged(textBox.Text);
+					if (props.TextChanged) props.TextChanged(textBox.Text, textBox);
 				},
 			}}
 		>

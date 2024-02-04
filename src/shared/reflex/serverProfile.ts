@@ -169,6 +169,12 @@ export const CreateProducer = (initialState: State) => {
 
 			return state;
 		},
+		secureUnassignBankAccountNumber: (oldState: State): State => {
+			const state = { ...oldState };
+			state.bankAccountNumber = undefined;
+
+			return state;
+		},
 		secureUseBankAccount: (oldState: State, accountNumber: string): State => {
 			const state = { ...oldState };
 			state.usedBankAccountNumber = accountNumber;

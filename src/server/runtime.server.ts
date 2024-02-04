@@ -12,6 +12,7 @@ import fallDamageApi from "./controller/fallDamageApi";
 import tempPlayerInfo from "./controller/tempPlayerInfo";
 import identificatorApi from "./controller/identificatorApi";
 import dayCycle from "./controller/dayCycle";
+import bankingApi from "./controller/bankingApi";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -28,6 +29,7 @@ maid.GiveTask(interactionApi());
 maid.GiveTask(playerBinder());
 maid.GiveTask(fallDamageApi());
 maid.GiveTask(identificatorApi());
+maid.GiveTask(bankingApi())
 maid.GiveTask(dayCycle());
 maid.GiveTask(containersApi());
 maid.GiveTask(storage());

@@ -32,9 +32,19 @@ export = (target: ScreenGui): (() => void) => {
 		const inventoryItems = 10;
 		const externalItems = 5;
 
-		clientStateProducer.setInventoryOpen(true);
+		// clientStateProducer.setInventoryOpen(true);
 		serverStateProducer.secureCreateContainer(inventoryContainerMaxWeight);
 		serverStateProducer.secureCreateContainer(trunkContainerMaxWeight);
+
+		serverStateProducer.secureRegisterBankAccount("11111111");
+		serverStateProducer.secureModifyBankAccountBalance("11111111", 100);
+		serverStateProducer.secureModifyBankAccountBalance("11111111", 100);
+		serverStateProducer.secureModifyBankAccountBalance("11111111", -500);
+		serverStateProducer.secureModifyBankAccountBalance("11111111", 100);
+		serverStateProducer.secureModifyBankAccountBalance("11111111", 10000);
+		serverStateProducer.secureModifyBankAccountBalance("11111111", -100);
+
+		serverProfileProducer.secureUseBankAccount("11111111");
 
 		for (let i = 0; i < inventoryItems; i++) {
 			serverStateProducer.secureAddItemToContainer(0, {
@@ -57,7 +67,7 @@ export = (target: ScreenGui): (() => void) => {
 		}
 
 		serverProfileProducer.secureSetInventoryContainerId(0);
-		serverProfileProducer.secureOpenExternalContainer(1);
+		// serverProfileProducer.secureOpenExternalContainer(1);
 
 		root.render(
 			Roact.createElement(gameRouter, {
