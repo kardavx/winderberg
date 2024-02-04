@@ -30,11 +30,6 @@ export default (props: Props) => {
 			setLastTransactionHistory(accountDetails[props.accountNumber].history);
 	}
 
-	const afterOperation = () => {
-		setTargetAmount(0);
-		setTargetAccount("0");
-	};
-
 	const renderedHistory: Roact.Element[] = [];
 	lastTransactionHistory.forEach((transaction, index) => {
 		renderedHistory.push(
@@ -119,9 +114,11 @@ export default (props: Props) => {
 										Size={UDim2.fromScale(1, 1)}
 										BackgroundColor3={palette.Overlay1}
 										BackgroundTransparency={0.8}
-										Text={targetAmount.map((amount) =>
-											amount === undefined ? "" : tostring(amount),
-										)}
+										Text={
+											targetAmount.getValue() === undefined
+												? ""
+												: tostring(targetAmount.getValue())
+										}
 										TextChanged={(text, textBox) => {
 											if (text !== undefined && tonumber(text) === undefined) {
 												textBox.Text = tostring(targetAmount.getValue());
@@ -140,7 +137,7 @@ export default (props: Props) => {
 										Size={UDim2.fromScale(1, 1)}
 										BackgroundColor3={palette.Overlay1}
 										BackgroundTransparency={0.8}
-										Text={targetAccount.map((account) => account)}
+										Text={targetAccount.getValue()}
 										TextChanged={(text, textBox) => {
 											if (text !== undefined && tonumber(text) === undefined) {
 												textBox.Text = tostring(targetAccount.getValue());
@@ -168,7 +165,6 @@ export default (props: Props) => {
 										if (amount === 0 || amount === undefined) return;
 
 										network.Deposit.fire(amount);
-										afterOperation();
 									}}
 								>
 									<uicorner CornerRadius={getViewportScaledUdim(20)} />
@@ -185,7 +181,6 @@ export default (props: Props) => {
 										if (amount === 0 || amount === undefined) return;
 
 										network.Withdraw.fire(amount);
-										afterOperation();
 									}}
 								>
 									<uicorner CornerRadius={getViewportScaledUdim(20)} />
@@ -206,7 +201,6 @@ export default (props: Props) => {
 											return;
 
 										network.Transfer.fire(target, amount);
-										afterOperation();
 									}}
 								>
 									<uicorner CornerRadius={getViewportScaledUdim(20)} />

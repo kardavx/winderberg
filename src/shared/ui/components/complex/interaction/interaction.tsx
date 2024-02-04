@@ -234,9 +234,7 @@ export default (props: CommonProps) => {
 			}),
 		);
 
-		return () => {
-			maid.DoCleaning();
-		};
+		return () => maid.DoCleaning();
 	});
 
 	return (

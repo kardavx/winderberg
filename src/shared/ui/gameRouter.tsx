@@ -14,6 +14,7 @@ import Inventory from "./components/complex/inventory/inventory";
 import Maid from "@rbxts/maid";
 import LocalPlayer from "shared/util/LocalPlayer";
 import BankWrapper from "./components/complex/bank/bankWrapper";
+import Location from "./components/complex/location/location";
 
 export default (props: {
 	clientState: ClientProducer;
@@ -56,6 +57,7 @@ export default (props: {
 					<HudRouter {...commonProps} />
 					<Inventory {...commonProps} />
 					<BankWrapper {...commonProps} />
+					<Location {...commonProps} />
 				</Fragment>,
 			)}
 

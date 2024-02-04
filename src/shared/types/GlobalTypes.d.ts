@@ -26,6 +26,14 @@ interface HumanoidWithAnimator extends Humanoid {
 	Animator: Animator;
 }
 
+interface Workspace extends Workspace {
+	ignore: Folder & {
+		Streets: Folder;
+		Postals: Folder;
+		Districts: Folder;
+	};
+}
+
 interface Character extends Model {
 	PrimaryPart: BasePart;
 	Humanoid: HumanoidWithAnimator;

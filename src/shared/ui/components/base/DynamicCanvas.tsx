@@ -12,21 +12,9 @@ export default (props: Props) => {
 	const baseProps = { ...props, Static: undefined, GroupTransparency: undefined };
 	const canvasProps = { GroupTransparency: props.GroupTransparency };
 
-	Roact.useEffect(() => {
-		const conn = clientSignals.onRender.Connect((deltaTime: number) => {
-			if (isStatic !== props.Static.getValue()) setIsStatic(props.Static.getValue());
-		});
-
-		return () => conn.Disconnect();
-	});
-
-	// if (isStatic) {
-	// 	return <frame {...baseProps}>{props.children}</frame>;
-	// } else {
-		return (
-			<canvasgroup {...baseProps} {...canvasProps}>
-				{props.children}
-			</canvasgroup>
-		);
-	// }
+	return (
+		<canvasgroup {...baseProps} {...canvasProps}>
+			{props.children}
+		</canvasgroup>
+	);
 };
