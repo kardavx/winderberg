@@ -4,6 +4,7 @@ import { ContainerItem, ContainersSchema } from "shared/types/ContainerTypes";
 export interface State {
 	serverStartTick: number;
 	containers: ContainersSchema;
+	bankAccounts: { [accountNumber: string]: { balance: number; isActive: boolean; history: number[] } };
 	storageContainerIds: { [storageId: string]: number };
 }
 
@@ -13,11 +14,17 @@ export interface Actions {
 	secureRemoveItemFromContainer: (containerId: number, index: number) => void;
 	secureSetServerStartTick: (tick: number) => void;
 	secureSetStorageContainerId: (storageId: string, containerId: number) => void;
+
+	secureRegisterBankAccount: (accountNumber: string) => void;
+	secureDeactivateBankAccount: (accountNumber: string) => void;
+
+	secureModifyBankAccountBalance: (accountNumber: string, difference: number) => void;
 }
 
 export const defaultState: State = {
 	serverStartTick: 0,
 	containers: [],
+	bankAccounts: {},
 	storageContainerIds: {},
 };
 
@@ -73,6 +80,38 @@ export const CreateProducer = (initialState: State) => {
 			const state = { ...oldState };
 			state.storageContainerIds = { ...state.storageContainerIds };
 			state.storageContainerIds[storageId] = containerId;
+
+			return state;
+		},
+		secureRegisterBankAccount: (oldState: State, accountNumber: string): State => {
+			if (oldState.bankAccounts[accountNumber] !== undefined) return oldState;
+
+			const state = { ...oldState };
+			state.bankAccounts = { ...state.bankAccounts };
+			state.bankAccounts[accountNumber] = { balance: 0, isActive: true, history: [] };
+
+			return state;
+		},
+		secureDeactivateBankAccount: (oldState: State, accountNumber: string): State => {
+			if (oldState.bankAccounts[accountNumber] === undefined) return oldState;
+
+			const state = { ...oldState };
+			state.bankAccounts = { ...state.bankAccounts };
+			state.bankAccounts[accountNumber] = { ...state.bankAccounts[accountNumber] };
+			state.bankAccounts[accountNumber].isActive = false;
+
+			return state;
+		},
+		secureModifyBankAccountBalance: (oldState: State, accountNumber: string, difference: number): State => {
+			if (oldState.bankAccounts[accountNumber] === undefined || !oldState.bankAccounts[accountNumber].isActive)
+				return oldState;
+
+			const state = { ...oldState };
+			state.bankAccounts = { ...state.bankAccounts };
+			state.bankAccounts[accountNumber] = { ...state.bankAccounts[accountNumber] };
+			state.bankAccounts[accountNumber].history = [...state.bankAccounts[accountNumber].history];
+			state.bankAccounts[accountNumber].history.unshift(difference);
+			state.bankAccounts[accountNumber].balance += difference;
 
 			return state;
 		},

@@ -16,7 +16,31 @@ interface Interactions {
 	[interactionType: string]: SubInteractions;
 }
 
-export const maxDistanceToContainer = 10;
+const distanceBasedInteraction = (
+	player: Player,
+	adornee: AllowedInteractionInstances,
+	maxDistance: number,
+	closeCallback: () => void,
+	producerSubscription: (cleanup: () => void) => () => void,
+) => {
+	const maid = new Maid();
+	maid.GiveTask(
+		serverSignals.onUpdate.Connect(() => {
+			if (player.Character === undefined) closeCallback();
+			if (!adornee.IsDescendantOf(Workspace)) closeCallback();
+			if (isInteractionLocked(adornee)) closeCallback();
+
+			const characterPosition = player.Character!.GetPivot().Position;
+			const adorneePosition = adornee.IsA("Model") ? adornee.PrimaryPart!.Position : adornee.Position;
+			const distance = characterPosition.sub(adorneePosition).Magnitude;
+			if (distance > maxDistance) closeCallback();
+		}),
+	);
+	maid.GiveTask(
+		serverSignals.playerRemoving.Connect((leavingPlayer: Player) => leavingPlayer === player && maid.DoCleaning()),
+	);
+	maid.GiveTask(producerSubscription(() => maid.DoCleaning()));
+};
 
 const containerInteractions: SubInteractions = {
 	Search: (player: Player, adornee: AllowedInteractionInstances) => {
@@ -28,30 +52,17 @@ const containerInteractions: SubInteractions = {
 
 		if (isInteractionLocked(adornee)) return;
 
-		const maid = new Maid();
-		maid.GiveTask(
-			serverSignals.onUpdate.Connect(() => {
-				if (player.Character === undefined) playerProfile.producer.closeExternalContainer();
-				if (!adornee.IsDescendantOf(Workspace)) playerProfile.producer.closeExternalContainer();
-				if (isInteractionLocked(adornee)) playerProfile.producer.closeExternalContainer();
-
-				const characterPosition = player.Character!.GetPivot().Position;
-				const adorneePosition = adornee.IsA("Model") ? adornee.PrimaryPart!.Position : adornee.Position;
-				const distance = characterPosition.sub(adorneePosition).Magnitude;
-				if (distance > maxDistanceToContainer) playerProfile.producer.closeExternalContainer();
-			}),
-		);
-		maid.GiveTask(
-			serverSignals.playerRemoving.Connect(
-				(leavingPlayer: Player) => leavingPlayer === player && maid.DoCleaning(),
-			),
-		);
 		playerProfile.producer.secureOpenExternalContainer(containerId);
-		maid.GiveTask(
-			playerProfile.producer.subscribe(
-				(state) => state.externalContainerId,
-				(containerId) => containerId === undefined && maid.DoCleaning(),
-			),
+		distanceBasedInteraction(
+			player,
+			adornee,
+			5,
+			() => playerProfile.producer.closeExternalContainer(),
+			(cleanup) =>
+				playerProfile.producer.subscribe(
+					(state) => state.externalContainerId,
+					(containerId) => containerId === undefined && cleanup(),
+				),
 		);
 	},
 };
@@ -90,12 +101,33 @@ const showDocument = (documentType: string) => (player: Player, adornee: Allowed
 		player,
 		`/me wyciąga z kieszeni portfel i pokazuje ${documentType} dla ${targetPlayerName}`,
 	);
-	task.wait(1)
+	task.wait(1);
 	network.ReceiveChatMessage.fire(
 		targetPlayer,
 		getServerDoText(
 			`na dokumencie widnieje imię i nazwisko ${playerName}, urodzony XX.XX.XXXX w USA, dokument ważny jest do 01.06.2034`,
 		),
+	);
+};
+
+const manageAccount = (accountNumber: string, player: Player, adornee: AllowedInteractionInstances) => {
+	const playerProfile = getPlayerProfile(player);
+	if (!playerProfile) return;
+
+	const profileState = playerProfile.producer.getState();
+	if (profileState.usedBankAccountNumber !== undefined) return;
+
+	playerProfile.producer.secureUseBankAccount(accountNumber);
+	distanceBasedInteraction(
+		player,
+		adornee,
+		5,
+		() => playerProfile.producer.stopUsingBankAccount(),
+		(cleanup) =>
+			playerProfile.producer.subscribe(
+				(state) => state.usedBankAccountNumber,
+				(accountNumber) => accountNumber === undefined && cleanup(),
+			),
 	);
 };
 
@@ -110,5 +142,41 @@ export const serverInteractionData: Interactions = {
 	},
 	CarDoor: {
 		...carInteractions,
+	},
+	ATM: {
+		ManageAccount: (player: Player, adornee: AllowedInteractionInstances) => {
+			const playerProfile = getPlayerProfile(player);
+			if (!playerProfile) return;
+
+			const profileState = playerProfile.producer.getState();
+			if (profileState.bankAccountNumber === undefined) return;
+
+			manageAccount(profileState.bankAccountNumber, player, adornee);
+		},
+	},
+	BankClerk: {
+		ManageAccount: (player: Player, adornee: AllowedInteractionInstances) => {
+			const playerProfile = getPlayerProfile(player);
+			if (!playerProfile) return;
+
+			const profileState = playerProfile.producer.getState();
+			if (profileState.bankAccountNumber === undefined) return;
+
+			manageAccount(profileState.bankAccountNumber, player, adornee);
+		},
+		CreateAccount: (player: Player, adornee: AllowedInteractionInstances) => {
+			const playerProfile = getPlayerProfile(player);
+			if (!playerProfile) return;
+
+			const profileState = playerProfile.producer.getState();
+			if (profileState.bankAccountNumber !== undefined) return;
+		},
+		DeactivateAccount: (player: Player, adornee: AllowedInteractionInstances) => {
+			const playerProfile = getPlayerProfile(player);
+			if (!playerProfile) return;
+
+			const profileState = playerProfile.producer.getState();
+			if (profileState.bankAccountNumber === undefined) return;
+		},
 	},
 };

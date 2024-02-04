@@ -21,6 +21,9 @@ export interface State {
 
 	id?: number;
 
+	bankAccountNumber?: string;
+	usedBankAccountNumber?: string;
+
 	lastPlayerPosition?: SerializedVector3;
 	lastCharacterHealth?: number;
 }
@@ -41,6 +44,12 @@ export interface Actions {
 	closeExternalContainer: () => void;
 
 	secureAssignId: (id: number) => void;
+	secureAssignBankAccountNumber: (accountNumber: string) => void;
+
+	secureUseBankAccount: (accountNumber: string) => void;
+	stopUsingBankAccount: () => void;
+
+	secureModifyMoney: (difference: number) => void;
 
 	startTyping: () => void;
 	endTyping: () => void;
@@ -59,7 +68,12 @@ export const defaultState: State = {
 	surname: surnames[math.random(0, names.size() - 1)],
 };
 
-export const saveExceptions: Partial<keyof State>[] = ["externalContainerId", "isTyping", "id"];
+export const saveExceptions: Partial<keyof State>[] = [
+	"externalContainerId",
+	"isTyping",
+	"id",
+	"usedBankAccountNumber",
+];
 export const replicationExceptions: Partial<keyof Actions>[] = [
 	"secureSetLastPlayerPosition",
 	"secureSetLastCharacterHealth",
@@ -146,6 +160,32 @@ export const CreateProducer = (initialState: State) => {
 		secureAssignId: (oldState: State, id: number): State => {
 			const state = { ...oldState };
 			state.id = id;
+
+			return state;
+		},
+		secureAssignBankAccountNumber: (oldState: State, accountNumber: string): State => {
+			const state = { ...oldState };
+			state.bankAccountNumber = accountNumber;
+
+			return state;
+		},
+		secureUseBankAccount: (oldState: State, accountNumber: string): State => {
+			const state = { ...oldState };
+			state.usedBankAccountNumber = accountNumber;
+
+			return state;
+		},
+		stopUsingBankAccount: (oldState: State): State => {
+			const state = { ...oldState };
+			state.usedBankAccountNumber = undefined;
+
+			return state;
+		},
+		secureModifyMoney: (oldState: State, difference: number): State => {
+			if (oldState.money < difference) return oldState;
+
+			const state = { ...oldState };
+			state.money = state.money + difference;
 
 			return state;
 		},
