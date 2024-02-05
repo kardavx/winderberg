@@ -154,7 +154,6 @@ export const CreateProducer = (initialState: State) => {
 		startTyping: (oldState: State): State => {
 			const state = { ...oldState };
 			state.isTyping = true;
-
 			return state;
 		},
 		endTyping: (oldState: State): State => {
