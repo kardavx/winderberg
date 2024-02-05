@@ -12,8 +12,12 @@ export default (props: Props) => {
 	const [characterName, setCharacterName] = Roact.useBinding(
 		tostring(props.playerCharacter.GetAttribute("characterName")),
 	);
+	const [sessionId, setSessionId] = Roact.useBinding(tostring(props.playerCharacter.GetAttribute("sessionId")));
 	const [characterDuty, setCharacterDuty] = Roact.useState(
 		tostring(props.playerCharacter.GetAttribute("characterDuty")),
+	);
+	const [characterTyping, setCharacterTyping] = Roact.useState(
+		props.playerCharacter.GetAttribute("characterTyping") as boolean,
 	);
 
 	Roact.useEffect(() => {
@@ -24,6 +28,10 @@ export default (props: Props) => {
 					setCharacterDuty(props.playerCharacter.GetAttribute(attributeName) as string);
 				} else if (attributeName === "characterName") {
 					setCharacterName(props.playerCharacter.GetAttribute(attributeName) as string);
+				} else if (attributeName === "characterId") {
+					setSessionId(props.playerCharacter.GetAttribute(attributeName) as string);
+				} else if (attributeName === "characterTyping") {
+					setCharacterTyping(props.playerCharacter.GetAttribute(attributeName) as boolean);
 				}
 			}),
 		);
@@ -64,7 +72,22 @@ export default (props: Props) => {
 				Size={UDim2.fromScale(1, 0.4)}
 				LayoutOrder={0}
 				BackgroundTransparency={1}
-			></frame>
+			>
+				<uilistlayout
+					HorizontalAlignment={Enum.HorizontalAlignment.Center}
+					VerticalAlignment={Enum.VerticalAlignment.Center}
+					SortOrder={Enum.SortOrder.LayoutOrder}
+					FillDirection={Enum.FillDirection.Horizontal}
+				></uilistlayout>
+				<imagelabel
+					Image={"rbxassetid://16257570995"}
+					Size={UDim2.fromScale(1, 1)}
+					BackgroundTransparency={1}
+					Visible={characterTyping}
+				>
+					<uiaspectratioconstraint></uiaspectratioconstraint>
+				</imagelabel>
+			</frame>
 		</>
 	);
 };

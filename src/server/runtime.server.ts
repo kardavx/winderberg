@@ -9,7 +9,6 @@ import containersApi from "./controller/containersApi";
 import interactionApi from "./controller/interactionApi";
 import storage from "./controller/storage";
 import fallDamageApi from "./controller/fallDamageApi";
-import tempPlayerInfo from "./controller/tempPlayerInfo";
 import identificatorApi from "./controller/identificatorApi";
 import dayCycle from "./controller/dayCycle";
 import bankingApi from "./controller/bankingApi";
@@ -29,11 +28,10 @@ maid.GiveTask(interactionApi());
 maid.GiveTask(playerBinder());
 maid.GiveTask(fallDamageApi());
 maid.GiveTask(identificatorApi());
-maid.GiveTask(bankingApi())
+maid.GiveTask(bankingApi());
 maid.GiveTask(dayCycle());
 maid.GiveTask(containersApi());
 maid.GiveTask(storage());
-maid.GiveTask(tempPlayerInfo());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 
 maid.GiveTask(
