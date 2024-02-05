@@ -8,6 +8,14 @@ interface Props {
 	playerCharacter: Character;
 }
 
+const dutyValue = (value: string) => {
+	if (value === "") {
+		return false;
+	} else {
+		return true;
+	}
+};
+
 export default (props: Props) => {
 	const [characterName, setCharacterName] = Roact.useBinding(
 		tostring(props.playerCharacter.GetAttribute("characterName")),
@@ -28,7 +36,7 @@ export default (props: Props) => {
 					setCharacterDuty(props.playerCharacter.GetAttribute(attributeName) as string);
 				} else if (attributeName === "characterName") {
 					setCharacterName(props.playerCharacter.GetAttribute(attributeName) as string);
-				} else if (attributeName === "characterId") {
+				} else if (attributeName === "sessionId") {
 					setSessionId(props.playerCharacter.GetAttribute(attributeName) as string);
 				} else if (attributeName === "characterTyping") {
 					setCharacterTyping(props.playerCharacter.GetAttribute(attributeName) as boolean);
@@ -49,7 +57,9 @@ export default (props: Props) => {
 				SortOrder={Enum.SortOrder.LayoutOrder}
 			></uilistlayout>
 			<textlabel // player name and id
-				Text={characterName || ""}
+				Text={Roact.joinBindings({ characterName, sessionId }).map(({ characterName, sessionId }) => {
+					return `${characterName} <font color="rgb(127,127,127)">(${sessionId})</font>`;
+				})}
 				RichText={true}
 				TextScaled={true}
 				FontFace={Font.fromEnum(Enum.Font.Ubuntu)}
@@ -67,6 +77,7 @@ export default (props: Props) => {
 				LayoutOrder={1}
 				BackgroundTransparency={1}
 				Size={UDim2.fromScale(1, 0.25)}
+				Visible={dutyValue(characterDuty)}
 			></textlabel>
 			<frame // duty
 				Size={UDim2.fromScale(1, 0.4)}

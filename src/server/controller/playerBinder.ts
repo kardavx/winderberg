@@ -6,6 +6,7 @@ import { defaultInventoryItems, inventoryContainerMaxWeight } from "shared/data/
 import { deserializeVector3 } from "shared/util/serializer";
 import { Players } from "@rbxts/services";
 import getPlayerNameAndSurname from "server/util/getPlayerNameAndSurname";
+import { State } from "shared/reflex/serverProfile";
 
 const updateInterval = 10;
 let nextUpdateTick = tick();
@@ -43,7 +44,14 @@ const playerBinder: InitializerFunction = () => {
 				character.SetAttribute("characterName", getPlayerNameAndSurname(player));
 				character.SetAttribute("characterDuty", "");
 				character.SetAttribute("characterTyping", false);
-				character.SetAttribute("sessionId", tostring(profile.producer.getState().id));
+				character.SetAttribute("sessionId", tostring(0));
+
+				characterMaids[player.Name].GiveTask(
+					profile.producer.subscribe((newState: State, oldState: State) => {
+						character.SetAttribute("characterTyping", newState.isTyping);
+						character.SetAttribute("sessionId", tostring(profile.producer.getState().id));
+					}),
+				);
 			});
 		}),
 	);
