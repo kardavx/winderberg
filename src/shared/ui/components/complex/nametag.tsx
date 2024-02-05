@@ -21,10 +21,10 @@ export default (props: Props) => {
 		tostring(props.playerCharacter.GetAttribute("characterName")),
 	);
 	const [sessionId, setSessionId] = Roact.useBinding(tostring(props.playerCharacter.GetAttribute("sessionId")));
-	const [characterDuty, setCharacterDuty] = Roact.useState(
+	const [characterDuty, setCharacterDuty] = Roact.useBinding(
 		tostring(props.playerCharacter.GetAttribute("characterDuty")),
 	);
-	const [characterTyping, setCharacterTyping] = Roact.useState(
+	const [characterTyping, setCharacterTyping] = Roact.useBinding(
 		props.playerCharacter.GetAttribute("characterTyping") as boolean,
 	);
 
@@ -56,29 +56,25 @@ export default (props: Props) => {
 				VerticalAlignment={Enum.VerticalAlignment.Bottom}
 				SortOrder={Enum.SortOrder.LayoutOrder}
 			></uilistlayout>
-			<textlabel // player name and id
+			<Text // player name and id
 				Text={Roact.joinBindings({ characterName, sessionId }).map(({ characterName, sessionId }) => {
 					return `${characterName} <font color="rgb(127,127,127)">(${sessionId})</font>`;
 				})}
+				Weight="Bold"
 				RichText={true}
 				TextScaled={true}
-				FontFace={Font.fromEnum(Enum.Font.Ubuntu)}
-				TextColor3={Color3.fromRGB(247, 247, 247)}
 				LayoutOrder={2}
-				BackgroundTransparency={1}
 				Size={UDim2.fromScale(1, 0.35)}
-			></textlabel>
-			<textlabel // duty
-				Text={characterDuty || ""}
+			/>
+			<Text // duty
+				Text={characterDuty.map((duty) => duty)}
 				RichText={true}
 				TextScaled={true}
-				FontFace={Font.fromEnum(Enum.Font.Ubuntu)}
 				TextColor3={Color3.fromRGB(0, 0, 200)}
 				LayoutOrder={1}
-				BackgroundTransparency={1}
 				Size={UDim2.fromScale(1, 0.25)}
-				Visible={dutyValue(characterDuty)}
-			></textlabel>
+				Visible={characterDuty.map((duty) => duty !== "")}
+			/>
 			<frame // duty
 				Size={UDim2.fromScale(1, 0.4)}
 				LayoutOrder={0}
@@ -94,7 +90,7 @@ export default (props: Props) => {
 					Image={"rbxassetid://16257570995"}
 					Size={UDim2.fromScale(1, 1)}
 					BackgroundTransparency={1}
-					Visible={characterTyping}
+					Visible={characterTyping.map((typing) => (typing !== undefined ? typing : false))}
 				>
 					<uiaspectratioconstraint></uiaspectratioconstraint>
 				</imagelabel>
