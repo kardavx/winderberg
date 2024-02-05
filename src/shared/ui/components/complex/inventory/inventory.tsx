@@ -15,6 +15,7 @@ import getViewportScaledUdim from "shared/ui/util/getViewportScaledUdim";
 import getItemsWeight from "shared/util/getItemsWeight";
 import clampedInverseLerp from "shared/util/clampedInverseLerp";
 import useSpring from "shared/ui/hook/useSpring";
+import network from "shared/network/network";
 
 const springParams = { initialValue: 0, stiffness: 60, dampening: 20 };
 
@@ -110,10 +111,12 @@ export default (props: CommonProps) => {
 						</frame>
 						<frame Size={UDim2.fromScale(1, 0.8)} BackgroundTransparency={1}>
 							<Container
-								containerId={inventoryContainerId}
-								isExternal={false}
-								externalContainerOpen={externalContainerId !== undefined}
-								{...props}
+								container={inventoryContainer}
+								lmbCallback={(index) => {
+									if (externalContainerId !== undefined) {
+										network.TransferItem.fire("External", index);
+									}
+								}}
 							/>
 						</frame>
 					</frame>
@@ -163,10 +166,10 @@ export default (props: CommonProps) => {
 				<frame Size={UDim2.fromScale(1, 0.85)} BackgroundTransparency={1}>
 					<Padding Size={10} />
 					<Container
-						containerId={externalContainerId}
-						isExternal={true}
-						externalContainerOpen={externalContainerId !== undefined}
-						{...props}
+						container={externalContainer}
+						lmbCallback={(index) => {
+							network.TransferItem.fire("Inventory", index);
+						}}
 					/>
 				</frame>
 				<frame Size={UDim2.fromScale(1, 0.09)} BackgroundTransparency={1}>
