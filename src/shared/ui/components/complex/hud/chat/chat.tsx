@@ -135,9 +135,6 @@ export default (props: CommonProps) => {
 			if (textBoxRef.current.IsFocused()) {
 				props.serverProfile.startTyping();
 			}
-
-			maid.GiveTask(textBoxRef.current.Focused.Connect(() => props.serverProfile.startTyping()));
-			maid.GiveTask(textBoxRef.current.FocusLost.Connect(() => props.serverProfile.endTyping()));
 		}
 
 		maid.GiveTask(
@@ -230,8 +227,10 @@ export default (props: CommonProps) => {
 					FocusChanged={(focused: boolean, enterPressed: boolean) => {
 						if (focused) {
 							setShownFactor(0);
+							props.serverProfile.startTyping();
 						} else {
 							setShownFactor(1);
+							props.serverProfile.endTyping();
 							if (enterPressed) {
 								const message = textBoxRef.current.Text;
 
