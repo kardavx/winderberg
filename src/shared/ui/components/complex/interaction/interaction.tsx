@@ -19,7 +19,7 @@ import network from "shared/network/network";
 export type AllowedInteractionInstances = BasePart | Model;
 
 const getFocusedInteraction = (): AllowedInteractionInstances | undefined => {
-	const FilterDescendantsInstances: Instance[] = [CurrentCamera];
+	const FilterDescendantsInstances: Instance[] = [CurrentCamera, Workspace.ignore];
 	if (LocalPlayer.Character) FilterDescendantsInstances.push(LocalPlayer.Character);
 
 	const raycastParams = new RaycastParams();

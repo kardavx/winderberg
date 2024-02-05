@@ -2,7 +2,6 @@ import Maid from "@rbxts/maid";
 import { CollectionService, ContextActionService, RunService, UserInputService, Workspace } from "@rbxts/services";
 import cameraModifier from "shared/class/cameraModifier";
 import cameraConfig from "shared/config/cameraConfig";
-import gameSignals from "shared/signal/clientSignals";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
 import lerpNumber from "shared/util/lerpNumber";
@@ -72,7 +71,12 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 	});
 
 	const cameraObstructionParams = new RaycastParams();
-	cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera, ...ignored];
+	cameraObstructionParams.FilterDescendantsInstances = [
+		character,
+		CurrentCamera,
+		...ignored,
+		...Workspace.ignore.GetChildren(),
+	];
 	cameraObstructionParams.IgnoreWater = false;
 	cameraObstructionParams.FilterType = Enum.RaycastFilterType.Exclude;
 
@@ -109,7 +113,12 @@ const camera: CharacterInitializerFunction = (character: Character) => {
 			});
 		});
 
-		cameraObstructionParams.FilterDescendantsInstances = [character, CurrentCamera, ...ignored];
+		cameraObstructionParams.FilterDescendantsInstances = [
+			character,
+			CurrentCamera,
+			...ignored,
+			...Workspace.ignore.GetChildren(),
+		];
 
 		const currentState = clientProducer.getState();
 

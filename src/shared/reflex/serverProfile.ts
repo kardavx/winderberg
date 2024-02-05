@@ -20,6 +20,7 @@ export interface State {
 	externalContainerId?: number;
 
 	id?: number;
+	location: string;
 
 	bankAccountNumber?: string;
 	usedBankAccountNumber?: string;
@@ -53,6 +54,8 @@ export interface Actions {
 
 	startTyping: () => void;
 	endTyping: () => void;
+
+	setLocation: (location: string) => void;
 }
 
 export const defaultState: State = {
@@ -64,6 +67,8 @@ export const defaultState: State = {
 	hunger: 100,
 	thirst: 100,
 
+	location: "",
+
 	name: names[math.random(0, names.size() - 1)],
 	surname: surnames[math.random(0, names.size() - 1)],
 };
@@ -72,6 +77,7 @@ export const saveExceptions: Partial<keyof State>[] = [
 	"externalContainerId",
 	"isTyping",
 	"id",
+	"location",
 	"usedBankAccountNumber",
 ];
 export const replicationExceptions: Partial<keyof Actions>[] = [
@@ -192,6 +198,12 @@ export const CreateProducer = (initialState: State) => {
 
 			const state = { ...oldState };
 			state.money = state.money + difference;
+
+			return state;
+		},
+		setLocation: (oldState: State, location: string): State => {
+			const state = { ...oldState };
+			state.location = location;
 
 			return state;
 		},
