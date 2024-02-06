@@ -26,7 +26,6 @@ const waitForContainerInit = (serverProfile: ProfileProducer): Promise<void> => 
 const inventory: InitializerFunction = () => {
 	const maid = new Maid();
 	const equipped = reactiveValue([] as Item[]);
-	const equippingBlock = false;
 
 	let profile = getServerProfile();
 
@@ -52,24 +51,6 @@ const inventory: InitializerFunction = () => {
 	} else {
 		clientSignals.playerDataLoaded.Once(() => onPlayerData(getServerProfile() as ProfileProducer));
 	}
-
-	maid.GiveTask(
-		equipped.subscribe((newEquipped, oldEquipped) => {
-			// handle equipped
-			newEquipped.forEach((equippedItem) => {
-				if (!oldEquipped.includes(equippedItem)) {
-					// equip
-				}
-			});
-
-			// handle unequipped
-			oldEquipped.forEach((equippedItem) => {
-				if (!newEquipped.includes(equippedItem)) {
-					// unequip
-				}
-			});
-		}),
-	);
 
 	maid.GiveTask(
 		clientSignals.handleItemEquip.Connect((index: number) => {
