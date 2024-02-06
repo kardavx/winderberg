@@ -1,7 +1,10 @@
-import Beacon from "@rbxts/beacon";
+import { Signal } from "@rbxts/beacon";
 
 export default {
-	onRender: new Beacon.Signal<number>(),
-	playerDataLoaded: new Beacon.Signal<void>(),
-	serverDataLoaded: new Beacon.Signal<void>(),
+	onRender: new Signal<number>(),
+	playerDataLoaded: new Signal<void>(),
+	serverDataLoaded: new Signal<void>(),
+
+	// inventory
+	handleItemEquip: new Signal<number>(),
 };

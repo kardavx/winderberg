@@ -1,6 +1,7 @@
 import Remo, { Client, Server, remote, throttleMiddleware } from "@rbxts/remo";
 import { t } from "@rbxts/t";
 import { $terrify } from "rbxts-transformer-t-new";
+import { icons } from "shared/data/notificationData";
 import { State as profileState } from "shared/reflex/serverProfile";
 import { State as serverState } from "shared/reflex/serverState";
 
@@ -18,6 +19,10 @@ export default Remo.createRemotes({
 	),
 	GetReplicatedState: remote<Client, [{ name: string; arguments: [...args: unknown[]] }]>(
 		t.interface({ name: t.string, arguments: t.array(t.any) }),
+	),
+
+	PushNotification: remote<Client, [{ title: string; description: string; icon: keyof typeof icons }]>(
+		$terrify<{ title: string; description: string; icon: keyof typeof icons }>(),
 	),
 
 	Withdraw: remote<Server, [number]>(t.number),

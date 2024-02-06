@@ -46,25 +46,25 @@ export = (target: ScreenGui): (() => void) => {
 
 		// serverProfileProducer.secureUseBankAccount("11111111");
 
-		for (let i = 0; i < inventoryItems; i++) {
-			serverStateProducer.secureAddItemToContainer(0, {
-				name: "debugItem",
-				type: "Food",
-				state: {
-					weight: 2,
-				},
-			});
-		}
+		// for (let i = 0; i < inventoryItems; i++) {
+		// 	serverStateProducer.secureAddItemToContainer(0, {
+		// 		name: "debugItem",
+		// 		type: "Food",
+		// 		state: {
+		// 			weight: 2,
+		// 		},
+		// 	});
+		// }
 
-		for (let i = 0; i < externalItems; i++) {
-			serverStateProducer.secureAddItemToContainer(1, {
-				name: "debugItem",
-				type: "Food",
-				state: {
-					weight: 2,
-				},
-			});
-		}
+		// for (let i = 0; i < externalItems; i++) {
+		// 	serverStateProducer.secureAddItemToContainer(1, {
+		// 		name: "debugItem",
+		// 		type: "Food",
+		// 		state: {
+		// 			weight: 2,
+		// 		},
+		// 	});
+		// }
 
 		serverProfileProducer.secureSetInventoryContainerId(0);
 		serverProfileProducer.secureOpenExternalContainer(1);

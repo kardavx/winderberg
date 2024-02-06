@@ -4,6 +4,7 @@ import { ContainerItem, ContainersSchema } from "shared/types/ContainerTypes";
 export interface State {
 	serverStartTick: number;
 	containers: ContainersSchema;
+	lastItemId: number;
 	bankAccounts: { [accountNumber: string]: { balance: number; isActive: boolean; history: number[] } };
 	storageContainerIds: { [storageId: string]: number };
 }
@@ -19,10 +20,12 @@ export interface Actions {
 	secureDeactivateBankAccount: (accountNumber: string) => void;
 
 	secureModifyBankAccountBalance: (accountNumber: string, difference: number) => void;
+	secureIncrementLastItemId: () => void;
 }
 
 export const defaultState: State = {
 	serverStartTick: 0,
+	lastItemId: 0,
 	containers: [],
 	bankAccounts: {},
 	storageContainerIds: {},
@@ -112,6 +115,12 @@ export const CreateProducer = (initialState: State) => {
 			state.bankAccounts[accountNumber].history = [...state.bankAccounts[accountNumber].history];
 			state.bankAccounts[accountNumber].history.unshift(difference);
 			state.bankAccounts[accountNumber].balance += difference;
+
+			return state;
+		},
+		secureIncrementLastItemId: (oldState: State): State => {
+			const state = { ...oldState };
+			state.lastItemId++;
 
 			return state;
 		},

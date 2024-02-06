@@ -3,6 +3,7 @@ export const icons = {
 	crime: "rbxassetid://13865688495",
 	strength: "rbxassetid://5044376068",
 	money: "rbxassetid://6908632622",
+	warning: "rbxassetid://14563958666",
 };
 
 export const notificationTime = 10;

@@ -19,7 +19,13 @@ const containersApi: InitializerFunction = () => {
 				to === "External" ? profileState.inventoryContainerId : profileState.externalContainerId;
 			const transferTo = to === "External" ? profileState.externalContainerId : profileState.inventoryContainerId;
 
-			transferItemToContainer(transferFrom, transferTo, index);
+			transferItemToContainer(transferFrom, transferTo, index).catch((err: string) => {
+				network.PushNotification.fire(player, {
+					title: "Inventory",
+					description: err,
+					icon: "warning",
+				});
+			});
 		}),
 	);
 

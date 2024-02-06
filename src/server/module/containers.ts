@@ -1,10 +1,39 @@
 import { ContainerItem } from "shared/types/ContainerTypes";
-import { waitForServerState } from "../controller/serverData";
+import { getServerState, waitForServerState } from "../controller/serverData";
 import getItemsWeight from "shared/util/getItemsWeight";
+import itemData, { ItemName } from "shared/data/itemData";
+import { defaultTypeState } from "shared/data/itemTypesData";
 
 const containerNotFound = () => `NO_CONTAINER`;
 const itemNotFound = () => `NO_ITEM`;
 const tooMuchWeight = () => `TOO_MUCH_WEIGHT`;
+
+const getItem = (itemName: ItemName[number]): Promise<ContainerItem> => {
+	return new Promise((resolve, reject) => {
+		const serverState = getServerState();
+		if (!serverState) {
+			reject("NO_SERVER_STATE");
+			return;
+		}
+
+		const item = itemData[itemName];
+		if (!item) {
+			reject("NO_ITEM_DATA");
+			return;
+		}
+
+		const itemClone = { ...item };
+		itemClone.state = { ...defaultTypeState[itemClone.type], ...itemClone.state };
+
+		const containerItem: ContainerItem = {
+			...item,
+			id: serverState.producer.getState().lastItemId + 1,
+		} as ContainerItem;
+		serverState.producer.secureIncrementLastItemId();
+
+		resolve(containerItem);
+	});
+};
 
 export const createContainer = (maxWeight: number, name?: string): Promise<number> => {
 	return new Promise((resolve) => {
@@ -18,7 +47,7 @@ export const createContainer = (maxWeight: number, name?: string): Promise<numbe
 	});
 };
 
-export const addItemToContainer = (containerId: number, item: ContainerItem): Promise<void> => {
+export const addItemToContainer = (containerId: number, itemName: ItemName[number]): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		waitForServerState().andThen((serverState) => {
 			const producerState = serverState.producer.getState();
@@ -27,22 +56,26 @@ export const addItemToContainer = (containerId: number, item: ContainerItem): Pr
 				return;
 			}
 
-			const incomingItemsWeight = item.state.weight;
-			const carryingWeight = getItemsWeight(producerState.containers[containerId].content);
+			getItem(itemName)
+				.andThen((item) => {
+					const incomingItemsWeight = item.state.weight;
+					const carryingWeight = getItemsWeight(producerState.containers[containerId].content);
 
-			if (carryingWeight + incomingItemsWeight > producerState.containers[containerId].maxWeight) {
-				reject(tooMuchWeight());
-				return;
-			}
+					if (carryingWeight + incomingItemsWeight > producerState.containers[containerId].maxWeight) {
+						reject(tooMuchWeight());
+						return;
+					}
 
-			serverState.producer.secureAddItemToContainer(containerId, item);
+					serverState.producer.secureAddItemToContainer(containerId, item);
 
-			resolve();
+					resolve();
+				})
+				.catch(reject);
 		});
 	});
 };
 
-export const addItemsToContainer = (containerId: number, items: ContainerItem[]): Promise<void> => {
+export const addItemsToContainer = (containerId: number, itemNames: ItemName[number][]): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		waitForServerState().andThen((serverState) => {
 			const producerState = serverState.producer.getState();
@@ -50,6 +83,13 @@ export const addItemsToContainer = (containerId: number, items: ContainerItem[])
 				reject(containerNotFound());
 				return;
 			}
+
+			const items: ContainerItem[] = [];
+			itemNames.forEach((itemName) =>
+				getItem(itemName)
+					.andThen((item) => items.push(item))
+					.catch(reject),
+			);
 
 			const incomingItemsWeight = getItemsWeight(items);
 			const carryingWeight = getItemsWeight(producerState.containers[containerId].content);
