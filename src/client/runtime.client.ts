@@ -12,6 +12,7 @@ import fallDamage from "shared/controller/fallDamage";
 import nametagCreator from "shared/controller/nametagCreator";
 import location from "shared/controller/location";
 import notification from "shared/controller/notification";
+import inventory from "shared/controller/inventory";
 
 StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.All, false);
 
@@ -59,6 +60,7 @@ maid.GiveTask(
 	}),
 );
 
+maid.GiveTask(inventory());
 maid.GiveTask(clientPlayerData());
 maid.GiveTask(notification());
 maid.GiveTask(clientInterface());

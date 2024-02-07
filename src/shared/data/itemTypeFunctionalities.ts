@@ -1,13 +1,9 @@
 import { ContainerItem } from "shared/types/ContainerTypes";
-import { ItemType, TypeStateSchema } from "./itemTypesData";
+import { ItemType } from "./itemTypesData";
 import Maid from "@rbxts/maid";
-import { State } from "shared/reflex/serverState";
 
 const itemTypeFunctionalities: {
-	[itemType in ItemType]: (
-		item: ContainerItem,
-		slice: (state: State) => TypeStateSchema,
-	) => [() => Promise<void>, Promise<void>] | void;
+	[itemType in ItemType]: (item: ContainerItem) => [() => Promise<void>, Promise<void>] | void;
 } = {
 	Primary: (item: ContainerItem) => {
 		const maid = new Maid();
@@ -15,22 +11,56 @@ const itemTypeFunctionalities: {
 		return [
 			() =>
 				new Promise((resolve) => {
-					maid.DoCleaning();
-
-					task.delay(2, resolve);
+					print(`unequipping ${item.name}`);
+					task.delay(2, () => {
+						maid.DoCleaning();
+						resolve();
+					});
 				}),
 			new Promise((resolve) => {
 				maid.GiveTask(() => {
-					print("essa");
+					print(`unequipped ${item.name}`);
 				});
 
-				task.delay(2, resolve);
+				print(`equipping ${item.name}`);
+				task.delay(2, () => {
+					print(`equipped ${item.name}`);
+					resolve();
+				});
 			}),
 		];
 	},
-	Secondary: (item: ContainerItem) => {},
-	Food: (item: ContainerItem) => {},
-	Water: (item: ContainerItem) => {},
+	Secondary: (item: ContainerItem) => {
+		const maid = new Maid();
+
+		return [
+			() =>
+				new Promise((resolve) => {
+					print(`unequipping ${item.name}`);
+					task.delay(2, () => {
+						maid.DoCleaning();
+						resolve();
+					});
+				}),
+			new Promise((resolve) => {
+				maid.GiveTask(() => {
+					print(`unequipped ${item.name}`);
+				});
+
+				print(`equipping ${item.name}`);
+				task.delay(2, () => {
+					print(`equipped ${item.name}`);
+					resolve();
+				});
+			}),
+		];
+	},
+	Food: (item: ContainerItem) => {
+		print(`used ${item.name}`);
+	},
+	Water: (item: ContainerItem) => {
+		print(`used ${item.name}`);
+	},
 };
 
 export default itemTypeFunctionalities;

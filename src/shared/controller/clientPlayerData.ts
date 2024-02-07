@@ -1,6 +1,5 @@
 import Maid from "@rbxts/maid";
 import network from "shared/network/network";
-import gameSignals from "shared/signal/clientSignals";
 
 import { CreateProducer as CreateClientProducer, defaultState, ClientProducer } from "shared/reflex/clientState";
 
@@ -17,6 +16,7 @@ import {
 	State as serverProdState,
 	replicationExceptions as serverReplicationExceptions,
 } from "shared/reflex/serverState";
+import clientSignals from "shared/signal/clientSignals";
 
 export let clientProducer: ClientProducer = CreateClientProducer(defaultState);
 export let serverProfile: ProfileProducer | undefined;
@@ -37,6 +37,26 @@ export const getServerProfile = () => {
 
 export const getServerState = () => {
 	return serverState;
+};
+
+export const waitForServerProfile = (): Promise<ProfileProducer> => {
+	return new Promise((resolve) => {
+		if (serverProfile !== undefined) {
+			resolve(serverProfile);
+			return;
+		}
+		clientSignals.playerDataLoaded.Once(() => resolve(serverProfile as ProfileProducer));
+	});
+};
+
+export const waitForServerState = (): Promise<ServerProducer> => {
+	return new Promise((resolve) => {
+		if (serverState !== undefined) {
+			resolve(serverState);
+			return;
+		}
+		clientSignals.serverDataLoaded.Once(() => resolve(serverState as ServerProducer));
+	});
 };
 
 const replicateProfileMiddleware = () => {
@@ -176,20 +196,20 @@ const clientPlayerData: InitializerFunction = () => {
 	loadProfile().andThen((serverProfileProducer) => {
 		serverProfile = serverProfileProducer;
 		isPlayerDataLoaded = true;
-		gameSignals.playerDataLoaded.Fire();
+		clientSignals.playerDataLoaded.Fire();
 	});
 
 	loadServerState().andThen((serverStateProducer) => {
 		serverState = serverStateProducer;
 		isServerDataLoaded = true;
-		gameSignals.serverDataLoaded.Fire();
+		clientSignals.serverDataLoaded.Fire();
 	});
 
 	maid.GiveTask(
 		network.GetReplicatedProfile.connect((data) => {
 			if (!isPlayerDataLoaded) {
 				warn("Queued profile action before player data loaded");
-				gameSignals.playerDataLoaded.Wait();
+				clientSignals.playerDataLoaded.Wait();
 			}
 
 			if (nextProfileActionIsReplicated) {

@@ -19,8 +19,6 @@ export interface State {
 	inventoryContainerId?: number;
 	externalContainerId?: number;
 
-	equippedItems: number[];
-
 	id?: number;
 	location: string;
 
@@ -57,9 +55,6 @@ export interface Actions {
 	startTyping: () => void;
 	endTyping: () => void;
 
-	equipItem: (itemId: number) => void;
-	unequpItem: (itemId: number) => void;
-
 	setLocation: (location: string) => void;
 }
 
@@ -68,8 +63,6 @@ export const defaultState: State = {
 	bank: 1000,
 
 	isTyping: false,
-
-	equippedItems: [],
 
 	hunger: 100,
 	thirst: 100,
@@ -210,25 +203,6 @@ export const CreateProducer = (initialState: State) => {
 		setLocation: (oldState: State, location: string): State => {
 			const state = { ...oldState };
 			state.location = location;
-
-			return state;
-		},
-		equipItem: (oldState: State, itemId: number): State => {
-			if (oldState.equippedItems.includes(itemId)) return oldState;
-
-			const state = { ...oldState };
-			state.equippedItems = [...state.equippedItems];
-			state.equippedItems.push(itemId);
-
-			return state;
-		},
-		unequipItem: (oldState: State, itemId: number): State => {
-			const itemIndex = oldState.equippedItems.find((id) => id === itemId);
-			if (itemIndex === undefined) return oldState;
-
-			const state = { ...oldState };
-			state.equippedItems = [...state.equippedItems];
-			state.equippedItems.remove(itemIndex);
 
 			return state;
 		},

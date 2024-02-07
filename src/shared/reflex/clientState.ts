@@ -7,6 +7,8 @@ export interface State {
 	stamina: number;
 	staminaUsageMultiplier: number;
 
+	equippedItems: number[];
+
 	mouseEnablers: string[];
 	lockEnablers: string[];
 	notifications: StoredNotification[];
@@ -27,6 +29,9 @@ export interface Actions {
 
 	setStaminaUsageMultiplier: (staminaUsageMultiplier: number) => void;
 
+	onItemEquipped: (itemId: number) => void;
+	onItemUnequipped: (itemId: number) => void;
+
 	setInventoryOpen: (inventoryOpen: boolean) => void;
 }
 
@@ -35,6 +40,8 @@ export const defaultState: State = {
 
 	stamina: 100,
 	staminaUsageMultiplier: 1,
+
+	equippedItems: [],
 
 	mouseEnablers: [],
 	lockEnablers: [],
@@ -126,6 +133,31 @@ export const CreateProducer = (initialState: State) => {
 		setInventoryOpen: (oldState: State, inventoryOpen: boolean): State => {
 			const state = { ...oldState };
 			state.inventoryOpen = inventoryOpen;
+
+			return state;
+		},
+		onItemEquipped: (oldState: State, itemId: number): State => {
+			if (oldState.equippedItems.includes(itemId)) {
+				warn(`Attempt to equip an already equipped item of id ${itemId}`);
+				return oldState;
+			}
+
+			const state = { ...oldState };
+			state.equippedItems = [...state.equippedItems];
+			state.equippedItems.push(itemId);
+
+			return state;
+		},
+		onItemUnequipped: (oldState: State, itemId: number): State => {
+			const equippedItemIndex = oldState.equippedItems.findIndex((equippeditem) => equippeditem === itemId);
+			if (equippedItemIndex === undefined) {
+				warn(`Attempt to unequip an unequipped item of id ${itemId}`);
+				return oldState;
+			}
+
+			const state = { ...oldState };
+			state.equippedItems = [...state.equippedItems];
+			state.equippedItems.remove(equippedItemIndex);
 
 			return state;
 		},

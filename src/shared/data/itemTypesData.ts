@@ -29,7 +29,7 @@ export const defaultTypeState: { [itemType in ItemType]: TypeStateSchema } = {
 	},
 };
 
-export const itemTypesBlockingEquip: ItemType[] = ["Primary", "Secondary"];
+export const handHeldItemTypes: ItemType[] = ["Primary", "Secondary"];
 
 export const itemDisplayTypes: { [itemType in ItemType]: string } = {
 	Primary: "Broń Długa",

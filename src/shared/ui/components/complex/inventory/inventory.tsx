@@ -16,6 +16,7 @@ import getItemsWeight from "shared/util/getItemsWeight";
 import clampedInverseLerp from "shared/util/clampedInverseLerp";
 import useSpring from "shared/ui/hook/useSpring";
 import network from "shared/network/network";
+import clientSignals from "shared/signal/clientSignals";
 
 const springParams = { initialValue: 0, stiffness: 60, dampening: 20 };
 
@@ -23,6 +24,7 @@ export default (props: CommonProps) => {
 	const [isOpen] = useProducerAsState(props.clientState, (state) => state.inventoryOpen);
 	const [inventoryContainerId] = useProducerAsState(props.serverProfile, (state) => state.inventoryContainerId);
 	const [externalContainerId] = useProducerAsState(props.serverProfile, (state) => state.externalContainerId);
+	const [equippedItems] = useProducerAsState(props.clientState, (state) => state.equippedItems);
 
 	const [inventoryContainer] = useProducerAsState(
 		props.serverState,
@@ -112,9 +114,15 @@ export default (props: CommonProps) => {
 						<frame Size={UDim2.fromScale(1, 0.8)} BackgroundTransparency={1}>
 							<Container
 								container={inventoryContainer}
+								equippedItems={equippedItems}
 								lmbCallback={(index) => {
 									if (externalContainerId !== undefined) {
 										network.TransferItem.fire("External", index);
+									}
+								}}
+								lmbDoubleClickCallback={(index) => {
+									if (externalContainerId === undefined) {
+										clientSignals.handleItemEquip.Fire(inventoryContainer.content[index].id);
 									}
 								}}
 							/>
@@ -167,6 +175,7 @@ export default (props: CommonProps) => {
 					<Padding Size={10} />
 					<Container
 						container={externalContainer}
+						equippedItems={equippedItems}
 						lmbCallback={(index) => {
 							network.TransferItem.fire("Inventory", index);
 						}}

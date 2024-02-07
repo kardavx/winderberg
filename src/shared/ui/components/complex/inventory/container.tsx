@@ -9,6 +9,7 @@ import { ContainerSchema } from "shared/types/ContainerTypes";
 
 interface Props {
 	container: ContainerSchema;
+	equippedItems: number[];
 	lmbDoubleClickCallback?: (index: number) => void;
 	lmbCallback: (index: number) => void;
 }
@@ -34,8 +35,10 @@ export default (props: Props) => {
 							if (props.lmbDoubleClickCallback) {
 								if (lastClicked) {
 									if (lastClicked.index === index) {
-										if (tick() - lastClicked.tick <= doubleClickWindow)
+										if (tick() - lastClicked.tick <= doubleClickWindow) {
 											props.lmbDoubleClickCallback(index);
+											lastClicked = undefined;
+										}
 									}
 								}
 								lastClicked = { index, tick: tick() };
@@ -68,7 +71,7 @@ export default (props: Props) => {
 						</imagelabel>
 						<Text
 							Size={UDim2.fromScale(0.8, 1)}
-							Text={item.name}
+							Text={`${item.name} ${props.equippedItems.includes(item.id) ? `(W UŻYCIU)` : ""}`}
 							CustomTextScaled={true}
 							TextWrapped={true}
 							Weight="Bold"

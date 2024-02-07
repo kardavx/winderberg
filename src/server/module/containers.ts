@@ -22,13 +22,16 @@ const getItem = (itemName: ItemName[number]): Promise<ContainerItem> => {
 			return;
 		}
 
-		const itemClone = { ...item };
-		itemClone.state = { ...defaultTypeState[itemClone.type], ...itemClone.state };
+		if (!defaultTypeState[item.type]) {
+			reject("NO_TYPE_CONFIG");
+			return;
+		}
 
 		const containerItem: ContainerItem = {
 			...item,
+			state: { ...defaultTypeState[item.type], ...item.state },
 			id: serverState.producer.getState().lastItemId + 1,
-		} as ContainerItem;
+		};
 		serverState.producer.secureIncrementLastItemId();
 
 		resolve(containerItem);
@@ -88,7 +91,10 @@ export const addItemsToContainer = (containerId: number, itemNames: ItemName[num
 			itemNames.forEach((itemName) =>
 				getItem(itemName)
 					.andThen((item) => items.push(item))
-					.catch(reject),
+					.catch((err) => {
+						warn(err);
+						reject(err);
+					}),
 			);
 
 			const incomingItemsWeight = getItemsWeight(items);

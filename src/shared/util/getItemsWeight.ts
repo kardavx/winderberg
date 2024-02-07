@@ -1,4 +1,3 @@
-import { ItemType } from "shared/data/itemTypesData";
 import { ContainerItem } from "shared/types/ContainerTypes";
 
 export default (items: ContainerItem[]): number => {
