@@ -24,8 +24,6 @@ const waitForContainerInit = (serverProfile: ProfileProducer): Promise<void> => 
 	});
 };
 
-const 
-
 const inventory: InitializerFunction = () => {
 	const maid = new Maid();
 	const equipped = reactiveValue([] as Item[]);
