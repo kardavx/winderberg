@@ -12,6 +12,7 @@ import fallDamageApi from "./controller/fallDamageApi";
 import identificatorApi from "./controller/identificatorApi";
 import dayCycle from "./controller/dayCycle";
 import bankingApi from "./controller/bankingApi";
+import queueHandler from "./controller/queueHandler";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -32,6 +33,7 @@ maid.GiveTask(bankingApi());
 maid.GiveTask(dayCycle());
 maid.GiveTask(containersApi());
 maid.GiveTask(storage());
+maid.GiveTask(queueHandler());
 // TO WAZNE, TUTAJ MUSZA BYC, NIE POD CONNECTAMI EVENTOW BO SIE WYJEBIE NA PYSK
 
 maid.GiveTask(
