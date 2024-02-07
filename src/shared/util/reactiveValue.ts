@@ -10,9 +10,11 @@ export default <T>(initialValue: T): ReactiveValue<T> => {
 
 	return {
 		set: (callback) => {
-			const previousValue = typeOf(value) === "table" ? { ...value } : value;
+			const previousValue = value;
 			const mutated = callback(value);
-			value = typeOf(mutated) === "table" ? { ...mutated } : mutated;
+			if (previousValue === mutated) return;
+
+			value = mutated;
 			subscribers.forEach((subscriber) => subscriber(value, previousValue));
 		},
 		get: () => {
