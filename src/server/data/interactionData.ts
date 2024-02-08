@@ -7,6 +7,7 @@ import getPlayerNameAndSurname from "server/util/getPlayerNameAndSurname";
 import network from "shared/network/network";
 import serverSignals from "shared/signal/serverSignals";
 import { AllowedInteractionInstances } from "shared/ui/components/complex/interaction/interaction";
+import angleBetween from "shared/util/angleBetween";
 import isInteractionLocked from "shared/util/interaction/isInteractionLocked";
 
 interface SubInteractions {
@@ -195,6 +196,30 @@ export const serverInteractionData: Interactions = {
 
 			serverState.producer.secureDeactivateBankAccount(profileState.bankAccountNumber);
 			playerProfile.producer.secureUnassignBankAccountNumber();
+		},
+	},
+	Door: {
+		Open: (player: Player, adornee: AllowedInteractionInstances) => {
+			if (!player.Character || !player.Character.PrimaryPart || !adornee.IsA("Model") || !adornee.PrimaryPart)
+				return;
+
+			const lookForward = adornee.PrimaryPart.CFrame.LookVector;
+			const lookToPoint = player.Character.PrimaryPart.CFrame.Position.sub(
+				adornee.PrimaryPart.CFrame.Position,
+			).Unit;
+			const angleDoorCharacter = angleBetween(lookForward, lookToPoint);
+
+			adornee.SetAttribute("RotationMultiplier", math.abs(math.deg(angleDoorCharacter)) > 100 ? -1 : 1);
+			adornee.SetAttribute(
+				"Open",
+				adornee.GetAttribute("Open") !== undefined ? !(adornee.GetAttribute("Open") as boolean) : true,
+			);
+		},
+		Lock: (player: Player, adornee: AllowedInteractionInstances) => {
+			adornee.SetAttribute(
+				"Locked",
+				adornee.GetAttribute("Locked") !== undefined ? !(adornee.GetAttribute("Locked") as boolean) : true,
+			);
 		},
 	},
 };

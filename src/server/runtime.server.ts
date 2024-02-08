@@ -13,6 +13,7 @@ import identificatorApi from "./controller/identificatorApi";
 import dayCycle from "./controller/dayCycle";
 import bankingApi from "./controller/bankingApi";
 import queueHandler from "./controller/queueHandler";
+import doorsApi from "./controller/doorsApi";
 
 const maid = new Maid();
 const characterMaids: { [name: string]: Maid } = {};
@@ -28,6 +29,7 @@ maid.GiveTask(vitals());
 maid.GiveTask(interactionApi());
 maid.GiveTask(playerBinder());
 maid.GiveTask(fallDamageApi());
+maid.GiveTask(doorsApi());
 maid.GiveTask(identificatorApi());
 maid.GiveTask(bankingApi());
 maid.GiveTask(dayCycle());

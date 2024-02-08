@@ -45,6 +45,29 @@ const carInteractions: SubInteraction[] = [
 	},
 ];
 
+const carDoorEnterInteraction: SubInteraction = {
+	name: "Wsiądź",
+	validator: notLockedValidator,
+	functionality: (doorModel) => {
+		const model = doorModel as Model;
+		const value = model.FindFirstChild("To") as ObjectValue;
+		const seat = value.Value as Seat;
+		seat.Disabled = false;
+
+		seat.Sit((LocalPlayer.Character as Character).Humanoid);
+	},
+};
+
+const doorOpenInteraction: SubInteraction = {
+	name: (doorModel) => {
+		return doorModel.GetAttribute("Open") === true ? "Zamknij" : "Otwórz";
+	},
+	validator: (doorModel) => {
+		return doorModel.GetAttribute("Locked") === false || doorModel.GetAttribute("Locked") === undefined;
+	},
+	serverActionId: "Open",
+};
+
 const sharedBankInteractions: SubInteraction[] = [
 	{
 		name: "Zarządzaj kontem",
@@ -114,14 +137,21 @@ const interactionData: Interactions = {
 		},
 		...carInteractions,
 	],
-	CarTrunk: [
+	CarTrunk: [carDoorEnterInteraction, ...carInteractions],
+	Door: [
+		doorOpenInteraction,
 		{
-			name: "Przeszukaj",
-			validator: notLockedValidator,
-			serverActionId: "Search",
+			name: (adornee) => {
+				return adornee.GetAttribute("Locked") === true ? "Odklucz" : "Zaklucz";
+			},
+			serverActionId: "Lock",
 		},
-		...carInteractions,
 	],
+};
+
+export const quickInteractions: { [interactionType: string]: SubInteraction } = {
+	CarDoor: carDoorEnterInteraction,
+	Door: doorOpenInteraction,
 };
 
 export const maxInteractionDistance = 15;

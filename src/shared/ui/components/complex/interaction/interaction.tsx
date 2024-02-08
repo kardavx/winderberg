@@ -7,7 +7,7 @@ import useSpring from "shared/ui/hook/useSpring";
 import clientSignals from "shared/signal/clientSignals";
 import CurrentCamera from "shared/util/CurrentCamera";
 import OnKeyClicked from "shared/util/OnKeyClicked";
-import interactionData, { defaultIcon, maxInteractionDistance } from "shared/data/interactionData";
+import interactionData, { defaultIcon, maxInteractionDistance, quickInteractions } from "shared/data/interactionData";
 import Center from "../../base/Center";
 import Padding from "../../base/Padding";
 import Text from "../../base/Text";
@@ -38,6 +38,41 @@ const getFocusedInteraction = (): AllowedInteractionInstances | undefined => {
 	if (raycastResult.Instance.HasTag("interaction")) return raycastResult.Instance as AllowedInteractionInstances;
 	if (raycastResult.Instance.HasTag("interactionMock")) {
 		return raycastResult.Instance.Parent as Model;
+	}
+};
+
+const getClosestInteraction = (range: number): AllowedInteractionInstances | undefined => {
+	if (!LocalPlayer.Character) return;
+
+	const interactions = [
+		...CollectionService.GetTagged("interaction"),
+		...CollectionService.GetTagged("interactionMock"),
+	];
+
+	let closest: { distance: number; interaction: Instance } | undefined;
+	interactions.forEach((interaction) => {
+		if (!interaction.IsA("BasePart")) return;
+		if (!LocalPlayer.Character || !LocalPlayer.Character.PrimaryPart) return;
+		if (
+			interaction.HasTag("interactionMock")
+				? interaction.Parent!.GetAttribute("interactionType") === "Player"
+				: interaction.GetAttribute("interactionType") === "Player"
+		)
+			return;
+
+		const distance = LocalPlayer.Character.PrimaryPart.Position.sub(interaction.Position).Magnitude;
+		if (distance > range) return;
+
+		if (!closest || closest.distance > distance) {
+			closest = { distance, interaction };
+		}
+	});
+
+	if (closest === undefined) return;
+
+	if (closest.interaction.HasTag("interaction")) return closest.interaction as AllowedInteractionInstances;
+	if (closest.interaction.HasTag("interactionMock")) {
+		return closest.interaction.Parent as Model;
 	}
 };
 
@@ -183,6 +218,41 @@ export default (props: CommonProps) => {
 			),
 		);
 
+		maid.GiveTask(
+			OnKeyClicked(
+				"quickInteraction",
+				() => {
+					print("quick interaction");
+					const interactionInRange = getClosestInteraction(6);
+					if (!interactionInRange) return;
+
+					print(interactionInRange);
+
+					const interactionType = interactionInRange.GetAttribute("interactionType") as string;
+
+					print("checking for quick interaction");
+
+					const quickInteraction = quickInteractions[interactionType];
+					if (!quickInteraction) return;
+
+					print("quick is here");
+
+					if (quickInteraction.validator && quickInteraction.validator(interactionInRange) === false) return;
+
+					print("running");
+
+					if (quickInteraction.functionality) {
+						quickInteraction.functionality(interactionInRange);
+					}
+
+					if (quickInteraction.serverActionId !== undefined) {
+						network.ReplicateInteraction.fire(quickInteraction.serverActionId, interactionInRange);
+					}
+				},
+				Enum.KeyCode.F,
+			),
+		);
+
 		interactions.forEach((interaction: Instance) => {
 			if (!interaction.IsA("BasePart") && !interaction.IsA("Model"))
 				error(
@@ -196,6 +266,22 @@ export default (props: CommonProps) => {
 				maid.GiveTask(interactionModelMock(interaction));
 			}
 		});
+
+		maid.GiveTask(
+			CollectionService.GetInstanceAddedSignal("interaction").Connect((interaction: Instance) => {
+				if (!interaction.IsA("BasePart") && !interaction.IsA("Model"))
+					error(
+						`${interaction.Name} has an incorrect type to be an interaction, accepted types are BasePart and Model, got ${interaction.ClassName}`,
+					);
+
+				if (interaction.GetAttribute("interactionType") === undefined)
+					error(`${interaction.Name} lacks the interactionType attribute!`);
+
+				if (interaction.IsA("Model")) {
+					maid.GiveTask(interactionModelMock(interaction));
+				}
+			}),
+		);
 
 		maid.GiveTask(
 			clientSignals.onRender.Connect((deltaTime: number) => {
