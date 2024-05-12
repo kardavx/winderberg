@@ -1,1 +1,2 @@
-jebac policje jebac zasady gdy widze kurwy to robie sie blady
+i aint doing this shit, for info refer to the 
+repository's description
